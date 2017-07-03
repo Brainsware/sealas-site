@@ -1,0 +1,10 @@
+{
+  "name": "sealas-site",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "lato": "*",
+    "fonts-raleway": "*",
+    "open-sans-fontface": "*"
+  }
+}

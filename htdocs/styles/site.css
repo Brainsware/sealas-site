@@ -1,0 +1,200 @@
+@charset "UTF-8";
+.heading-block h1, .heading-block h2, .heading-block h3 {
+  text-transform: none; }
+.heading-block small a {
+  font-size: 14px;
+  margin-left: 1em; }
+
+.promo {
+  padding: 30px; }
+
+.yellow-sealas {
+  color: #ffffff;
+  background-color: #ffb645; }
+
+.pre {
+  white-space: pre-wrap; }
+
+hr, p {
+  margin: 20px 0; }
+
+@media (max-width: 767px) {
+  .container-sm {
+    margin: 0;
+    padding: 0;
+    width: 100% !important; }
+
+  .button {
+    white-space: normal; } }
+.blog-rss {
+  position: absolute;
+  top: 0;
+  right: 0; }
+
+.social-icon {
+  display: inline-block !important;
+  float: none !important; }
+
+.social-icon i {
+  line-height: 38px; }
+
+.social-icon.si-small i {
+  line-height: 30px !important; }
+
+ul li:hover ul, ul li:active ul, ul li ul:hover {
+  display: block !important; }
+
+.hero-header {
+  color: white; }
+  .hero-header h1, .hero-header i {
+    color: white !important; }
+
+.entry {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto; }
+
+.entry-content p, .entry-content li {
+  font-size: 20px !important; }
+  .entry-content p img, .entry-content li img {
+    margin: 0 auto;
+    display: block; }
+
+.entry-title h1 {
+  margin: 0;
+  font-size: 42px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px; }
+  @media (max-width: 767px) {
+    .entry-title h1 {
+      font-size: 28px; } }
+
+.entry-title h2 {
+  font-size: 30px;
+  font-weight: 700; }
+
+ul.entry-meta {
+  margin: 0; }
+  ul.entry-meta li {
+    margin: 0; }
+
+.si-share div > * {
+  vertical-align: top !important; }
+
+.si-share span {
+  line-height: normal; }
+
+#footer-logo {
+  margin-top: 8px;
+  padding-right: 18px;
+  border-right: 1px solid #4A4A4A;
+  width: 200px; }
+
+footer h3 {
+  font-size: 14px;
+  font-weight: normal; }
+
+#logo {
+  margin-right: 0px; }
+
+@media (max-width: 1025px) {
+  #logo img {
+    max-height: 60px !important;
+    margin-top: 20px; }
+
+  #header.sticky-header:not(.static-sticky) img {
+    margin-top: 0px; } }
+@media (min-width: 991px) {
+  #logo img {
+    padding: 3px; }
+
+  #logo.always-show-logo img {
+    max-height: 60px;
+    margin-top: 20px; } }
+@media (max-width: 991px) {
+  #header-logo {
+    display: none; }
+
+  #logo img {
+    max-height: 60px;
+    margin-top: 20px; }
+
+  .user-login-5 .login-container > .login-content {
+    padding: 0; } }
+@media (max-width: 400px) {
+  #footer-logo {
+    float: none; } }
+p, li {
+  font-size: 16px !important; }
+
+ul, li {
+  margin-left: 9px; }
+
+li {
+  margin-bottom: 0.5em; }
+
+#primary-menu li {
+  margin-bottom: 0; }
+
+.divider.divider-short:after {
+  left: 0; }
+
+#header .login-menu {
+  padding-left: 25px;
+  margin-left: 15px;
+  border-left: 1px solid #eee; }
+
+#header .lang-menu {
+  margin-left: 15px;
+  border-left: 1px solid #eee; }
+  #header .lang-menu ul {
+    width: 75px !important; }
+
+#primary-menu ul li > a.btn {
+  padding: 6px 12px;
+  margin: 30px 5px; }
+
+#header.sticky-header:not(.static-sticky) #primary-menu > ul > li > a.btn {
+  padding: 6px 12px;
+  margin: 12px 5px; }
+
+.user-login-5, .login-bg, .login-container {
+  min-height: 0; }
+
+.login-content.login-content-site {
+  margin-top: 0;
+  margin-bottom: 0; }
+
+.user-login-5 {
+  background-color: #ffb645; }
+  .user-login-5 p {
+    font-size: 18px; }
+  .user-login-5 .input-icon i {
+    bottom: 5px; }
+  .user-login-5 input, .user-login-5 select {
+    background: white !important;
+    height: auto;
+    padding: 9px; }
+  .user-login-5 input {
+    padding: 10px; }
+
+.forget-password-block {
+  margin-top: 20px;
+  font-size: 14px; }
+
+.pricing-box.pricing-extended .pricing-features li {
+  margin: 0; }
+  .pricing-box.pricing-extended .pricing-features li::before {
+    font-family: "font-icons";
+    content: "";
+    margin-right: 7px; }
+.pricing-box.pricing-extended .pricing-action-area {
+  padding: 25px; }
+  .pricing-box.pricing-extended .pricing-action-area .pricing-price span.price-tenure {
+    display: inline-block;
+    margin-left: 10px; }
+  .pricing-box.pricing-extended .pricing-action-area .pricing-meta.pricing-meta-vat {
+    font-size: 12px; }
+
+/*# sourceMappingURL=site.css.map */
