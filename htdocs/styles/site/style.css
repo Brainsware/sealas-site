@@ -5534,8 +5534,7 @@ body:not(.device-touch) .entry-link {
 .fb_iframe_widget > span,
 .fb-comments > span > iframe,
 .fb_iframe_widget > span > iframe {
-	display: block !important;
-	width: 100% !important;
+	display: inline-block !important;
 	margin: 0;
 }
 
@@ -13011,4 +13010,3 @@ body:not(.no-transition) #wrapper,
 	margin:0!important;
 	padding:0!important
 }
-

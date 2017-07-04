@@ -14748,7 +14748,6 @@ body:not(.no-transition) #wrapper,
 	padding:0!important
 }
 
-
 /* ----------------------------------------------------------------
 	Responsive CSS
 -----------------------------------------------------------------*/
@@ -16518,3 +16517,4 @@ only screen and (                min-resolution: 2dppx) and (max-width: 991px) {
 	#logo a.standard-logo { display: none; }
 	#logo a.retina-logo { display: inline-block; }
 }
+
