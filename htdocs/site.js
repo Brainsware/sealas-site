@@ -8,11 +8,17 @@ window.onscroll = function(e) {
 };
 
 document.querySelectorAll('#primary-menu-trigger,#overlay-menu-close').forEach(function(e) {
-  return e.onclick = document.getElementById('primary-menu').getElementsByClassName('mobile-primary-menu') > 0 ? document.querySelectorAll('#primary-menu > ul.mobile-primary-menu, #primary-menu > div > ul.mobile-primary-menu').forEach(function(e) {
-    return e.classList.toggle("show");
-  }) : document.querySelectorAll('#primary-menu > ul, #primary-menu > div > ul').forEach(function(e) {
-    return e.classList.toggle("show");
-  });
+  return e.onclick = function() {
+    if (document.getElementById('primary-menu').getElementsByClassName('mobile-primary-menu') > 0) {
+      return document.querySelectorAll('#primary-menu > ul.mobile-primary-menu, #primary-menu > div > ul.mobile-primary-menu').forEach(function(e) {
+        return e.classList.toggle("show");
+      });
+    } else {
+      return document.querySelectorAll('#primary-menu > ul, #primary-menu > div > ul').forEach(function(e) {
+        return e.classList.toggle("show");
+      });
+    }
+  };
 });
 
 false;
