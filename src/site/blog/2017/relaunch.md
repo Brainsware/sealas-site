@@ -1,10 +1,10 @@
 ---
 title: "Relaunching Sealas or: How I learned to stop worrying and kill our product"
 date: 2017-07-07
-draft: true
+draft: false
 ---
 
-![graceful failure](https://images-ext-2.discordapp.net/external/Lj5DiDVsUctZpxTupsoj8qr-IBjiCblnjt-_yCZwTDY/https/pbs.twimg.com/media/DDAZiqFWAAA6ALY.jpg%3Alarge)
+![graceful failure](/images/site/blog/2017/ta-daaa.jpeg)
 
 Sealas was our our first attempt to create a SaaS.
 
