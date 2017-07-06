@@ -116,9 +116,8 @@ within our business model.
 
 ### Point 2: Our process behind the development is going to be open source
 
-Starting with this post, we are going to be writing about everything we do
-regarding Sealas. How and why we develop certain parts, how and why we design
-certain parts, and how we are doing with the business part of it.
+Starting with this post, we are going to be publishing a weekly blog post about everything we do regarding Sealas:
+How and why we develop certain parts, how and why we design certain parts, and how we are doing with the business part of it.
 
 ### Point 3: Our pricing is going to be Pay What You Want
 
