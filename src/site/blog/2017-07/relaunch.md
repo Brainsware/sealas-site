@@ -4,7 +4,7 @@ date: 2017-07-07
 draft: false
 ---
 
-![graceful failure](/images/site/blog/2017/ta-daaa.jpeg)
+![graceful failure](/images/site/blog/2017-07/ta-daaa.jpeg)
 
 Sealas was our our first attempt to create a SaaS.
 

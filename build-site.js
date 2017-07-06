@@ -81,7 +81,7 @@ metalsmith(__dirname)
   .use(permalinks({
     relative: false,
     pattern: ':locale/:title/',
-    date: 'YYYY',
+    date: 'YYYY-MM',
     linksets: [
       {
         match: { collection: 'blog' },
