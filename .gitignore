@@ -1,4 +1,5 @@
 htdocs/**/*.html
+htdocs/**/*.xml
 .sass-cache
 **/vendor
 
