@@ -60,6 +60,8 @@
 		</div>
 	</div>
 
-	{% include 'cta.tpl' %}
+	<div class="container clearfix">
+		{% include 'cta_blog.tpl' %}
+	</div>
 </div>
 {% endblock %}
