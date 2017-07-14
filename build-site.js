@@ -27,7 +27,7 @@ var path       = require('path'),
  app_uri    = debug ? 'http://app.sealas.local' : 'https://app.sealas.at';
  site_uri    = debug ? 'http://sealas.local' : 'https://sealas.at';
 
- const DEFAULT_LOCALE = 'de';
+ const DEFAULT_LOCALE = 'en';
  const LOCALES = ['de', 'en'];
 
 metalsmith(__dirname)
