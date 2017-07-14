@@ -7,11 +7,11 @@
 		<span>{{ __('blog_subtitle') }}</span>
 
 		<div class="blog-rss">
-			<a href="{{ site.url }}/rss_{{ locale }}.xml" class="social-icon si-dark si-colored si-rss nobottommargin" style="margin-right: 10px;">
+			<a href="{{ site.url }}/rss_blog.xml" class="social-icon si-dark si-colored si-rss nobottommargin" style="margin-right: 10px;">
 				<i class="icon-rss"></i>
 				<i class="icon-rss"></i>
 			</a>
-			<a href="{{ site.url }}/rss_{{ locale }}.xml"><small style="display: inline-block; margin-top: 3px;">Get our<br><strong>RSS feed!</strong></small></a>
+			<a href="{{ site.url }}/rss_blog.xml"><small style="display: inline-block; margin-top: 3px;">Get our<br><strong>RSS feed!</strong></small></a>
 		</div>
 	</div>
 </section>
