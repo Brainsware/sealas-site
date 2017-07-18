@@ -1,6 +1,6 @@
 <div id="section-buy" class="promo promo-border">
 
-	<div class="clearfix">
+	<div class="{% if header %}container {% endif %}clearfix">
 
 		<div id="mc_embed_signup" class="widget subscribe-widget clearfix col-md-10 col-md-offset-1">
 			<form action="//sealas.us13.list-manage.com/subscribe/post?u=26cea96bbfb24fbc5f58e314f&amp;id=a92e310c11" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
@@ -23,8 +23,17 @@
 					<div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
 					</div>
 			</form>
-		</div>
 
+			{% if rss %}
+			<div class="blog-rss">
+				<a href="{{ site.url }}/rss_blog.xml" class="social-icon si-dark si-colored si-rss nobottommargin" style="margin-right: 10px;">
+					<i class="icon-rss"></i>
+					<i class="icon-rss"></i>
+				</a>
+				<a href="{{ site.url }}/rss_blog.xml"><small style="display: inline-block; margin-top: 3px;">Get our<br><strong>RSS feed!</strong></small></a>
+			</div>
+			{% endif %}
+		</div>
 	</div>
 
 </div>

@@ -1,20 +1,10 @@
 {% extends 'layout.tpl' %}
 
 {% block content %}
-<section id="page-title" class="page-title-nobg">
-	<div class="container entry clearfix" style="padding: 0;margin-bottom: 0;border:0">
-		<h1 style="padding-top: 10px">{{ __('blog_title') }}</h1>
-		<span>{{ __('blog_subtitle') }}</span>
-
-		<div class="blog-rss">
-			<a href="{{ site.url }}/rss_blog.xml" class="social-icon si-dark si-colored si-rss nobottommargin" style="margin-right: 10px;">
-				<i class="icon-rss"></i>
-				<i class="icon-rss"></i>
-			</a>
-			<a href="{{ site.url }}/rss_blog.xml"><small style="display: inline-block; margin-top: 3px;">Get our<br><strong>RSS feed!</strong></small></a>
-		</div>
+	<div class="clearfix" style="padding: 0;margin-bottom: 0;border:0">
+		{% include 'cta_blog.tpl' with { 'rss': true, 'header': true } %}
 	</div>
-</section>
+
 <section id="content">
 <div class="content-wrap">
 	<div class="container clearfix">
