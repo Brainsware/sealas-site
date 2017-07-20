@@ -1,7 +1,7 @@
 ---
 layout: index.tpl
 title: Home
-permalink: false
+permalink: true
 ---
 
 **Pew Pew**
