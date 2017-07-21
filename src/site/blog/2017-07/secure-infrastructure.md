@@ -18,14 +18,14 @@ If we consider (filesystem) storage, databases, and backups to be services, it s
 
 As far as the network is concerned, we can begin by looking at the classic [The Eight Fallacies of Distributed Computing](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing)
 
-The network is reliable.
-Latency is zero.
-Bandwidth is infinite.
-The network is secure.
-Topology doesn't change.
-There is one administrator.
-Transport cost is zero.
-The network is homogeneous.
+- The network is reliable.
+- Latency is zero.
+- Bandwidth is infinite.
+- The network is secure.
+- Topology doesn't change.
+- There is one administrator.
+- Transport cost is zero.
+- The network is homogeneous.
 
 As far as our application is concerned, the first four points are the most interesting to us.
 Especially as it pertains to the application's security.
