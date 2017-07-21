@@ -1,9 +1,13 @@
-# Contributing a quick-fixed
+# CONTRIBUTING
+
+This document roughly describes how you can contribute to our project.
+
+## Contributing a quick-fixed
 
 We encourage everyone who finds a spelling or wording-issue to submit a patch.
 The easiest venue for that is probably Github's edit button!
 
-# Contributing a new blog post
+## Contributing a new blog post
 
 If you contributed a few Pull-Requests or Issues, you may want to write about the topic of these!
 Here's a quick guide for how to write a new blog post:
@@ -15,7 +19,7 @@ Here's a quick guide for how to write a new blog post:
 
 You can test your changes with:
 
-```
+```sh
 yarn install
 nodejs ./build-site.js prod
 # use your favourite HTTP server to view htdocs/index.html
