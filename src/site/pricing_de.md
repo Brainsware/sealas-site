@@ -8,6 +8,8 @@ title: pricing
 * Keine Mühe mit der Installation und Updates
 * Deine Daten bleiben deine: Lade sie jederzeit runter oder lösche sie!
 
+<!-- markdownlint-disable -->
+
 ---
 section: faq
 ---

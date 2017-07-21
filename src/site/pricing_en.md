@@ -8,6 +8,8 @@ title: pricing
 * No hassle with installation and updates
 * Your data remains yours: Download it or delete it anytime!
 
+<!-- markdownlint-disable -->
+
 ---
 section: faq
 ---
