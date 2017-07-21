@@ -3,4 +3,4 @@ layout: blog.tpl
 title: Blog
 ---
 
-**Pew Pew**
+## Pew Pew

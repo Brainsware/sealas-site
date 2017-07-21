@@ -102,7 +102,6 @@ This would probably make it impossible to have it tax deductible though, so the 
 This concludes the threat model for the application itself.
 There is one more part missing, which we'll cover next week: the infrastructure.
 
-
 [1]: https://www.schneier.com/blog/archives/2009/02/balancing_secur.html
 [2]: https://www.schneier.com/blog/archives/2016/10/security_design.html
 [3]: https://www.amazon.com/Design-Everyday-Things-Revised-Expanded/dp/0465050654/ref=pd_lpo_sbs_14_t_0?_encoding=UTF8&psc=1&refRID=1QCP270GQSGYEEPW4F8B
