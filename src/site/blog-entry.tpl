@@ -1,12 +1,14 @@
 {% extends 'layout.tpl' %}
 
+{% block title %}{{ title }} - {% endblock %}
+
 {% block head_meta %}
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@sealasapp">
 <meta property="og:url" content="{{ site_uri }}/{{ path }}">
 <meta property="og:title" content="{{ title }}">
 <meta property="og:description" content="{{ excerpt }}">
-<meta property="og:image" content="{{ static_uri }}/images/sealas-logo-white-yellow.png">
+<meta property="og:image" content="{{ site_uri }}/images/sealas-logo-white-yellow.png">
 {% endblock %}
 
 {% block content %}
