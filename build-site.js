@@ -25,7 +25,11 @@ var path       = require('path'),
  //static_uri = debug ? 'http://static.sealas.local' : 'https://static.sealas.at';
  static_uri = '';
  app_uri    = debug ? 'http://app.sealas.local' : 'https://app.sealas.at';
- site_uri    = debug ? 'http://sealas.local' : 'https://sealas.at';
+ site_uri   = debug ? 'http://sealas.local' : 'https://sealas.at';
+
+ ignored_files = ['locales/*', '*.tpl', '*.json']
+ if (!debug)
+  ignored_files.push('drafts/');
 
  const DEFAULT_LOCALE = 'en';
  const LOCALES = ['de', 'en'];
@@ -40,7 +44,7 @@ metalsmith(__dirname)
   .source('./src/site')
   .destination('./htdocs')
   .clean(true)
-  .use(ignore(['locales/*', '*.tpl', '*.json']))
+  .use(ignore(ignored_files))
   .use(drafts())
   .use(collections({
     'blog': {
