@@ -1,5 +1,5 @@
 ---
-title: "Securing Infrastructure"
+title: "Creating a Secure Cloud Infrastructure"
 date: 2017-07-21
 draft: false
 ---
