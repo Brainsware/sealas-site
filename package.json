@@ -8,7 +8,7 @@
   "author": "Daniel Khalil <d.khalil@brainsware.at> (https://brainsware.at)",
   "devDependencies": {
     "coffee-script": "1.*",
-    "coffeeify": "^2.1.0",
+    "coffeeify": "^3.0.0",
     "grunt": ">=0.4",
     "grunt-browserify": "^5.0.0",
     "grunt-contrib-concat": "^1.0.1",
