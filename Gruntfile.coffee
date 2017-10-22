@@ -28,7 +28,7 @@ module.exports = (grunt) ->
 
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-concat'
-  grunt.loadNpmTasks 'grunt-contrib-sass'
+  grunt.loadNpmTasks 'grunt-sass'
   grunt.loadNpmTasks 'grunt-browserify'
 
   grunt.registerTask 'default', ['browserify', 'concat']
