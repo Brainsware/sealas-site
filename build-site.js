@@ -20,6 +20,7 @@ var path       = require('path'),
  feed          = require('metalsmith-feed'),
  sitemap       = require('metalsmith-sitemap'),
  moment        = require('metalsmith-moment'),
+ extlinks      = require('metalsmith-external-links'),
  layouts       = require('metalsmith-layouts');
 
  //static_uri = debug ? 'http://static.sealas.local' : 'https://static.sealas.at';
@@ -101,6 +102,11 @@ metalsmith(__dirname)
   .use(feed({
     'collection': 'blog',
     'destination': 'rss_blog.xml'
+  }))
+  .use(extlinks({
+    'domain': 'sealas.at',
+    'rel': 'external',
+    'target': '_blank'
   }))
   .use(sitemap({
     'hostname': site_uri,
