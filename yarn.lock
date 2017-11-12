@@ -1109,13 +1109,6 @@ form-data@~2.3.1:
     combined-stream "^1.0.5"
     mime-types "^2.1.12"
 
-fs-extra@^2.0.0:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-2.1.2.tgz#046c70163cef9aad46b0e4a7fa467fb22d71de35"
-  dependencies:
-    graceful-fs "^4.1.2"
-    jsonfile "^2.1.0"
-
 fs-extra@~0.26.5:
   version "0.26.7"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-0.26.7.tgz#9ae1fdd94897798edab76d0918cf42d0c3184fa9"
@@ -2022,7 +2015,7 @@ lodash@^3.10.1, lodash@^3.2.0, lodash@~3.10.1:
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
 
-lodash@^4.0.0, lodash@^4.17.4, lodash@~4.17.4:
+lodash@^4.0.0, lodash@~4.17.4:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 
@@ -2060,9 +2053,9 @@ map-obj@^1.0.0, map-obj@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
 
-markdown-it@^8.3.1:
-  version "8.3.1"
-  resolved "https://registry.yarnpkg.com/markdown-it/-/markdown-it-8.3.1.tgz#2f4b622948ccdc193d66f3ca2d43125ac4ac7323"
+markdown-it@8.3.2:
+  version "8.3.2"
+  resolved "https://registry.yarnpkg.com/markdown-it/-/markdown-it-8.3.2.tgz#df4b86530d17c3bc9beec3b68d770b92ea17ae96"
   dependencies:
     argparse "^1.0.7"
     entities "~1.1.1"
@@ -2070,23 +2063,23 @@ markdown-it@^8.3.1:
     mdurl "^1.0.1"
     uc.micro "^1.0.3"
 
-markdownlint-cli@^0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/markdownlint-cli/-/markdownlint-cli-0.3.1.tgz#7e05809f27e7f50886bf05adc7d2d25bb3b05293"
+markdownlint-cli@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/markdownlint-cli/-/markdownlint-cli-0.5.0.tgz#5c9562667efbf3298cfedb66d50c0a891b62cb39"
   dependencies:
     commander "~2.9.0"
     deep-extend "~0.4.1"
     glob "~7.0.3"
     lodash.flatten "~4.3.0"
     lodash.values "~4.2.0"
-    markdownlint "~0.4.1"
+    markdownlint "~0.6.1"
     rc "~1.1.6"
 
-markdownlint@~0.4.1:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/markdownlint/-/markdownlint-0.4.1.tgz#37320ca944938024fd6b421b2401ad349349588a"
+markdownlint@~0.6.1:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/markdownlint/-/markdownlint-0.6.2.tgz#c16a5713cbd6245db2866741f32dd0920624d88d"
   dependencies:
-    markdown-it "^8.3.1"
+    markdown-it "8.3.2"
 
 marked@~0.3.1:
   version "0.3.6"
@@ -2128,14 +2121,6 @@ metalsmith-archive@^0.1.1:
     lodash.isempty "^3.0.4"
     lodash.remove "^3.1.0"
     moment "^2.10.3"
-
-metalsmith-assets-improved@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/metalsmith-assets-improved/-/metalsmith-assets-improved-1.0.0.tgz#ccaa4d8ed491f263f3a9733f3686dd3e9917394e"
-  dependencies:
-    debug "^2.2.0"
-    fs-extra "^2.0.0"
-    lodash "^4.17.4"
 
 metalsmith-better-excerpts@^0.1.7:
   version "0.1.7"
