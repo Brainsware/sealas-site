@@ -63,10 +63,10 @@
 						</ul>#}
 
 						<ul class="one-page-menu sf-js-enabled lang-menu">
-							<li><a><img src="{{ static_uri }}/images/flags/{{ locale_flag }}.png" alt="" /> {{ locale }}</a>
+							<li><a><img src="{{ static_uri }}/images/flags/{{ locale_flag }}.png" alt="{{ locale }}" /> {{ locale }}</a>
 								<ul>
-									<li><a href="/de"><img src="{{ static_uri }}/images/flags/at.png" alt="" /> de</a></li>
-									<li><a href="/en"><img src="{{ static_uri }}/images/flags/gb.png" alt="" /> en</a></li>
+									<li><a href="/de"><img src="{{ static_uri }}/images/flags/at.png" alt="de" /> de</a></li>
+									<li><a href="/en"><img src="{{ static_uri }}/images/flags/gb.png" alt="en" /> en</a></li>
 								</ul>
 							</li>
 						</ul>
