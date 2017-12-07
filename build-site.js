@@ -24,15 +24,17 @@ var path       = require('path'),
  layouts       = require('metalsmith-layouts'),
  domTransform  = require('metalsmith-dom-transform');
 
-const highlight = require('highlight.js');
+codeHighlight = function(options) {
+  const highlight = require('highlight.js');
 
-return function codeHighlight(root, data, metalsmith, done) {
- Array.from(root.querySelectorAll('code')).forEach(node => {
-   highlight.highlightBlock(node);
- });
+  return function highlightContent(root, data, metalsmith, done) {
+   Array.from(root.querySelectorAll('code')).forEach(node => {
+     highlight.highlightBlock(node);
+   });
 
- done();
-};
+   done();
+  };
+}
 
  //static_uri = debug ? 'http://static.sealas.local' : 'https://static.sealas.at';
  static_uri = '';
