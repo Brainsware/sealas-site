@@ -21,7 +21,18 @@ var path       = require('path'),
  sitemap       = require('metalsmith-sitemap'),
  moment        = require('metalsmith-moment'),
  extlinks      = require('metalsmith-external-links'),
- layouts       = require('metalsmith-layouts');
+ layouts       = require('metalsmith-layouts'),
+ domTransform  = require('metalsmith-dom-transform');
+
+const highlight = require('highlight.js');
+
+return function codeHighlight(root, data, metalsmith, done) {
+ Array.from(root.querySelectorAll('code')).forEach(node => {
+   highlight.highlightBlock(node);
+ });
+
+ done();
+};
 
  //static_uri = debug ? 'http://static.sealas.local' : 'https://static.sealas.at';
  static_uri = '';
@@ -82,6 +93,11 @@ metalsmith(__dirname)
   .use(excerpts({
     pruneLength: 480,
     stripTags: false
+  }))
+  .use(domTransform({
+    transforms: [
+      codeHighlight()
+    ]
   }))
   .use(permalinks({
     relative: false,

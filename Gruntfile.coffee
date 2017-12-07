@@ -7,6 +7,7 @@ module.exports = (grunt) ->
           "htdocs/styles/site/dark.css",
           "htdocs/styles/site/style.css",
           "htdocs/styles/site/responsive.css",
+          "node_modules/highlight.js/styles/darcula.css",
         ]
         dest: 'htdocs/styles/front.css'
     browserify:
