@@ -13,7 +13,7 @@ We were offering end-to-end encryption for our users, but the the only way we co
 In Git the author of a commit is determined simply by a setting in your local Git client.
 This can be changed at any time, to anything you want, like so:
 
-```plain
+```sh
 git config --global user.email "therealgeorgy_w@gov.us"
 git config --global user.name  "Really George Washington"
 ```
@@ -86,7 +86,7 @@ I can also highly recommend verifying the enabled modes with a GUI program, sinc
 Finally, there's the issue of simply forgetting to plug the Yubikey key while writing a long-winded Git commit message.
 The result will be an error message like:
 
-```plain
+```sh
 error: gpg failed to sign the data
 fatal: failed to write commit object
 ```
