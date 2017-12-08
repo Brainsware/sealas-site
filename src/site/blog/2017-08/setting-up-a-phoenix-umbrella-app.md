@@ -46,7 +46,7 @@ This one could easily be replaced by a Node.js or Apache server, but since it's 
 
 ## Building the umbrella
 
-```
+```sh
 mix phx.new sealas --umbrella
 ```
 
@@ -54,7 +54,7 @@ This is the generator script for Phoenix umbrella projects, which is very simila
 
 The generated directory structure looks like this:
 
-```
+```sh
 | sealas
 | > apps
 | > > sealas
@@ -68,7 +68,7 @@ We do however need to add at least two applications to our project: sealas_api a
 
 First we need to switch to the apps directory, then generate our new apps:
 
-```
+```sh
 cd apps/
 mix phx.new sealas_api
 mix phx.new sealas_sso
@@ -80,7 +80,7 @@ With `mix phx.new` we generate a new Phoenix 1.3 app - `mix phoenix.new` is the 
 
 Each of the apps has its own separate config files found in `APP_NAME/config`, which is also where you set the ports.
 
-```
+```elixir
 config :sealas_web, SealasWeb.Endpoint,
   http: [port: 4000],
 ```
