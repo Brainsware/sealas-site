@@ -80,6 +80,16 @@ Following the advice in [7 Best Practices for JSON Web Tokens](https://dev.to/ne
 The only parties involved in the authentication process, who also need to be able to decrypt the tokens, are those who also have access to all the metadata.
 So, we can safely remove the JWT headers, which not only makes our tokens safer, they also instantly become a lot lighter.
 
+So this:
+```
+eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIiwidHlwIjoiSldUIn0._WnS7PvFmgu0FvAz.iegtMdcmfSgQugR9BrwmHVfI2dXamI1p.wIgF8ktsZrr7J-lz-kNQ3w
+```
+
+turns into this:
+```
+_WnS7PvFmgu0FvAz.iegtMdcmfSgQugR9BrwmHVfI2dXamI1p.wIgF8ktsZrr7J-lz-kNQ3w
+```
+
 If at any point some third party should be included in the process, we can simply define one set of acceptable parameters and still not need any headers in our tokens.
 
 ## SealasTokens
