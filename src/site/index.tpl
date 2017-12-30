@@ -53,9 +53,9 @@
 
 					<p>
 						{% if locale == 'de' %}
-						<a href="/blog/2017/warum-wir-zero-knowledge-software-entwickeln/" style="font-size: 20px">Warum Zero-Knowledge?</a>
+						<a href="/blog/2017-02/warum-wir-zero-knowledge-software-entwickeln/" style="font-size: 20px">Warum Zero-Knowledge?</a>
 						{% else %}
-						<a href="/blog/2017/why-we-develop-zero-knowledge-software/" style="font-size: 20px">Why Zero Knowledge?</a>
+						<a href="/blog/2017-02/why-we-develop-zero-knowledge-software/" style="font-size: 20px">Why Zero Knowledge?</a>
 						{% endif %}
 					</p>
 				</div>
