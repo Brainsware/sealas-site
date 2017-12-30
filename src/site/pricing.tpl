@@ -6,6 +6,11 @@
 	<div class="container clearfix">
 	<div class="clear"></div>
 	<div class="divider divider-short divider-center"><i class="icon-circle"></i></div>
+	<div class="container clearfix">
+			<h3>{{ __('pricing_beginning') }}</h3>
+		{% include 'cta_blog.tpl' %}
+	</div>
+	<div class="divider divider-short divider-center"><i class="icon-circle"></i></div>
 	<div id="section-contact" class="heading-block title-center page-section">
 		<h1>{{ __('pricing_title') }}</h1>
 		<span>{{ __('pricing_subtitle') }}</span>
@@ -43,10 +48,6 @@
 		{{ faq | safe }}
 	</div>
 
-	</div>
-
-	<div class="container clearfix">
-		{% include 'cta_blog.tpl' %}
 	</div>
 </div>
 {% endblock %}
