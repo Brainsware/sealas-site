@@ -13,11 +13,11 @@ APIs provide you with resources you need or want in another part of an applicati
 
 ## Packages and parts
 
-Our users need to identify themselves via some kind of password, which at no point ever should be stored in cleartext. To that end, we're going to use a password hashing library: [Comeonin](https://github.com/riverrun/comeonin) with [Argon2](https://github.com/riverrun/argon2_elixir). For those who don't know, a password hashing library is different from a normal hashing library in that it is as slow as is *sensible *- depending on the system you're on. This makes bruteforce attacks, i.e. trying different combinations of passwords until you find a correct one, a lot harder and more resource intensive.
+Our users need to identify themselves via some kind of password, which at no point ever should be stored in cleartext. To that end, we're going to use a password hashing library: [Comeonin](https://github.com/riverrun/comeonin) with [Argon2](https://github.com/riverrun/argon2_elixir). For those who don't know, a password hashing library is different from a normal hashing library in that it is as slow as is *sensible* - depending on the system you're on. This makes bruteforce attacks, i.e. trying different combinations of passwords until you find a correct one, a lot harder and more resource intensive.
 
 On a testing environment however that is not necessary, so to our `config/test.exs` file we can simply add:
 
-```erlang
+```elixir
 config :argon2_elixir,
   t_cost: 2,
   m_cost: 12
@@ -27,7 +27,7 @@ With that we have our token storage covered. To make it a bit easier to read our
 
 We're also going to need to include our own authtoken library:
 
-```erlang
+```elixir
 {:argon2_elixir, "~> 1.2"},
 {:comeonin, "~> 4.0"},
 {:base_model, "~> 0.2"},
@@ -52,7 +52,7 @@ mix ecto.gen.migration create_users
 
 I'm going to give the user a few more fields and features than just the bare-bones version, containing just an email and password field, but you can simplify or extend from that depending on your needs.
 
-```erlang
+```elixir
 defmodule SealasSso.Repo.Migrations.CreateUsers do
   use Ecto.Migration
 
@@ -81,7 +81,7 @@ For simplicity's sake we'll skip this part for now, but keep these fields in min
 
 With our migration set, we can go ahead and create a corresponding schema definition.
 
-```erlang
+```elixir
 defmodule SealasSso.Accounts.User do
   use BaseModel, repo: SealasSso.Repo
   import Ecto.Changeset
@@ -100,13 +100,13 @@ defmodule SealasSso.Accounts.User do
 end
 ```
 
-At the top of the file we `use BaseModel` and tell it the repo file we're using. The schema mirrors our migration file except for `EctoHashedPassword` , which automatically transforms all input into its hashed form. [I wrote another post explaining custom ecto types using another type as an example](https://sealas.at/blog/2017-11/custom-ecto-types/), so I will only add an abbreviated version here.
+At the top of the file we `use BaseModel` and tell it the repo file we're using. The schema mirrors our migration file except for `EctoHashedPassword`, which automatically transforms all input into its hashed form. [I wrote another post explaining custom ecto types using another type as an example](https://sealas.at/blog/2017-11/custom-ecto-types/), so I will only add an abbreviated version here.
 
 ## Custom password ecto type
 
 The base for our custom type will be a string, since we're going to save the hash as a string to the database. This makes the whole procedure very simple, as we're going to base our type on the string ecto type.
 
-```erlang
+```elixir
 defmodule SealasSso.EctoHashedPasswordTest do
   use SealasSso.DataCase
 
@@ -125,7 +125,7 @@ end
 
 Since we inherit most functionality from ecto's native type, we can focus on testing what we would add: the cast function hashing our input and an interface to the verification function of the hash of our choice.
 
-```erlang
+```elixir
 defmodule EctoHashedPassword do
   @behaviour Ecto.Type
   def type, do: :string
@@ -156,7 +156,7 @@ Well, almost.
 
 To ensure that we're not breaking anything, let's add a test verifying that even in case of a future hash change, our previously stored Argon2 hashes still get verified. Given the hypothetical case that we panic because Argon2 has been completely broken, and we need to change our algorithm NOW, we secure ourselves against forgetting to include the ability to still accept old Argon2 hashes; even if we only output hashes with a different algorithm. Aren't tests nifty little buggers?
 
-```erlang
+```elixir
 @argon2_hash "$argon2i$v=19$m=65536,t=6,p=1$79ljDB93b7A3W4LsbyoI2A$yiYBzrw1OaQiS86YESKTrwh8l9NnsUpbugddemKPv0w"
 
 test "verify argon2 hash", do: assert EctoHashedPassword.checkpw("test_password", @argon2_hash)
@@ -170,7 +170,7 @@ Now that we have our migration, schema and type done, we can move on to the cont
 
 to find out and define what we're going to expect our authentication to look and behave like.
 
-```erlang
+```elixir
 defmodule SealasSso.AuthControllerTest do
   use SealasSso.ConnCase
 
@@ -205,7 +205,7 @@ With this in place, we can now set some test data and setup functions for creati
 
 What do we want a successful login to look like?
 
-```erlang
+```elixir
   describe "login" do
     setup [:create_user]
 
@@ -230,7 +230,7 @@ What do we want a successful login to look like?
 
 The most important part here is actually the first two lines of the test:
 
-```erlang
+```elixir
 conn = get conn, auth_path(conn, :index), @valid_login
 assert %{"auth" => auth_token} = json_response(conn, 201)
 ```
@@ -239,17 +239,17 @@ Accessing the `auth_path` route should give us a 201 HTTP code response, which s
 
 All that's missing is covering failure states; failed authentication because of bad credentials, and refused access for a protected route.
 
-```erlang
-    test "fail to authenticate with wrong password", %{conn: conn} do
-      conn = get conn, auth_path(conn, :index), @failed_login
-      assert json_response(conn, 401) == %{"error" => "auth fail"}
-    end
+```elixir
+test "fail to authenticate with wrong password", %{conn: conn} do
+  conn = get conn, auth_path(conn, :index), @failed_login
+  assert json_response(conn, 401) == %{"error" => "auth fail"}
+end
 
-    test "get 401 for protected route", %{conn: conn} do
-      conn = get conn, user_path(conn, :index)
+test "get 401 for protected route", %{conn: conn} do
+  conn = get conn, user_path(conn, :index)
 
-      assert json_response(conn, 401) == %{"error" => "auth fail"}
-    end
+  assert json_response(conn, 401) == %{"error" => "auth fail"}
+end
 ```
 
 This covers our basic usage cases for a login, so:
@@ -258,7 +258,7 @@ This covers our basic usage cases for a login, so:
 
 Knowing what our authentication controller is supposed to do, this is pretty straight forward:
 
-```erlang
+```elixir
 defmodule SealasSso.AuthController do
   use SealasSso, :controller
 
@@ -290,7 +290,7 @@ Our authtoken library is nice enough to prepare us some tokens, but we still hav
 
 First, getting a timed out token
 
-```erlang
+```elixir
 conn = get conn, auth_path(conn, :index), @valid_login
 assert %{"auth" => auth_token} = json_response(conn, 201)
 
@@ -300,7 +300,7 @@ assert %{"auth" => auth_token} = json_response(conn, 201)
 
 Requesting the token is analogous to the login. Next we'll decrypt it, and inject a creation time way in the past so it's going to be timed out -- or at least we expect it to be!
 
-```erlang
+```elixir
 conn = conn
 |> recycle()
 |> put_req_header("authorization", "bearer: " <> auth_token)
@@ -311,7 +311,7 @@ assert json_response(conn, 401) == %{"error" => "timeout"}
 
 The process for creating tokens that need to be refreshed is exactly the same, we just replace `"rt"` (refresh time) with `"ct"` (creation time); and we'll test for another message:
 
-```erlang
+```elixir
 conn = conn
 |> recycle()
 |> put_req_header("authorization", "bearer: " <> stale_token)
@@ -322,14 +322,14 @@ assert json_response(conn, 401) == %{"error" => "needs_refresh"}
 
 But we're not done here, `needs_refresh` is after all a request to refresh the token to be able to continue working with the API. So let's imagine how we'd go about getting a new token.
 
-```erlang
+```elixir
 conn = get conn, auth_path(conn, :index), %{token: stale_token}
 assert %{"auth" => auth_token} = json_response(conn, 201)
 ```
 
 And then let's retry the request expecting it to be successful this time.
 
-```erlang
+```elixir
 conn = conn
 |> recycle()
 |> put_req_header("authorization", "bearer: " <> auth_token)
@@ -338,9 +338,9 @@ conn = conn
 assert json_response(conn, 200)
 ```
 
-The timeout and refresh answer should get handled by the library's router plug `verify_token` . What is still missing is the refreshing of stale tokens, which given the easily accessible method \`refresh_token\`, also shouldn't be much of a problem:
+The timeout and refresh answer should get handled by the library's router plug `verify_token`. What is still missing is the refreshing of stale tokens, which given the easily accessible method \`refresh_token\`, also shouldn't be much of a problem:
 
-```erlang
+```elixir
 def index(conn, %{"token" => auth_token}) do
   {:ok, token} = AuthToken.decrypt_token(auth_token)
 
@@ -365,7 +365,7 @@ Refreshing tokens has one actually useful purpose: allowing you to check back wi
 
 The test cases for refreshments need an additional one to ensure that if the user is not valid anymore, we don't get a new access token.
 
-```erlang
+```elixir
 test "refuse refreshing of token if user has been deleted or deactivated", %{conn: conn} do
   user = User.first(email: @valid_login.email)
 
@@ -387,7 +387,7 @@ Hidden here within `create_stale_token/1`  is the same method to acquire a stale
 
 On the implementation side of things we just need to add the same checks we already use for the normal login process.
 
-```erlang
+```elixir
 def index(conn, %{"token" => auth_token}) do
   {:ok, token} = AuthToken.decrypt_token(auth_token)
 
