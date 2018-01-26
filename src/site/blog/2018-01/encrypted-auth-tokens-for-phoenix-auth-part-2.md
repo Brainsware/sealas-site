@@ -23,8 +23,7 @@ There are [some](https://www.schneier.com/blog/archives/2009/07/another_new_aes.
 
 > *And for new applications I suggest that people don't use AES-256.
 AES-128 provides more than enough security margin for the forseeable future.
-But if you're already using AES-256, there's no reason to change.
-*
+But if you're already using AES-256, there's no reason to change.*
 
 Other than this quote from Schneier, AES-128 has the advantage of being slightly faster and slightly smaller in output, while providing a solution that is *secure enough*.
 Another point to keep in mind: tokens are short lived, so if at any point we should discover that AES-128 isn't secure enough any more, we can simply exchange it for something better.
