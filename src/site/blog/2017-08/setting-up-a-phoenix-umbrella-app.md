@@ -90,4 +90,4 @@ config :sealas_web, SealasWeb.Endpoint,
 Each app also defines their respective dependencies in `APP_NAME/mix.exs`.
 So until I am convinced of the advantages of further splitting the project apart, `sealas_api` and `sealas_sso` will handle the storage directly, which makes it necessary to add Ecto to the list of dependencies.
 
-That's it for the basic setup for Sealas as an umbrella project! You can follow the development of Sealas here on [Github](https://github.com/Brainsware/sealas)
+That's it for the basic setup for Sealas as an umbrella project! To see the whole project structure in action, you can check it out on [Github](https://github.com/Brainsware/sealas)
