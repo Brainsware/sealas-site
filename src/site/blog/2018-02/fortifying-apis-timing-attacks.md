@@ -20,7 +20,7 @@ Depending on the kind of action, overall design and delay you could even provide
 
 ## Implementation in Elixir
 
-Let's go over an example implementation that is currently in use in Sealas.
+Let's go over an example implementation that is currently in use in [Sealas](https://github.com/Brainsware/sealas).
 We can add a test for this in our authentication test suite:
 
 ```elixir
