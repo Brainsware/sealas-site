@@ -3,7 +3,7 @@ title: Setting up a Phoenix Umbrella App
 date: 2017-08-24
 ---
 
-Our decision to run the rewrite of [Sealas])(https://github.com/Brainsware/sealas) with [Elixir](https://elixir-lang.org) came out of our interest in the language and the architecture behind it.
+Our decision to run the rewrite of [Sealas](https://github.com/Brainsware/sealas) with [Elixir](https://elixir-lang.org) came out of our interest in the language and the architecture behind it.
 
 Elixir is a (more) readable Erlang, which builds upon OTP, which makes it highly suitable for any distributed system or networked system in general.
 Failure states are an integral part of the system, which means that if any critical error or exception occurs the process just [crashes](http://wiki.c2.com/?LetItCrash) - or shuts down - and restarts.
