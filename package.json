@@ -14,7 +14,7 @@
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-uglify": "^3.3.0",
     "grunt-sass": "*",
-    "markdownlint-cli": "^0.7.0",
+    "markdownlint-cli": "^0.8.0",
     "metalsmith": "*",
     "metalsmith-archive": "^0.1.1",
     "metalsmith-better-excerpts": "^0.1.7",
