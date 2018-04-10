@@ -50,7 +50,7 @@
 						<ul class="one-page-menu sf-js-enabled" style="touch-action: pan-y;">
 							{#}<li><a href="/{{ locale }}/features"><div>{{ __('features') }}</div></a></li>#}
 							<li><a href="/{{ locale }}/about"><div>{{ __('about') }}</div></a></li>
-							<li><a href="/{{ locale }}/pricing"><div>{{ __('pricing') }}</div></a></li>
+							{#}<li><a href="/{{ locale }}/pricing"><div>{{ __('pricing') }}</div></a></li>#}
 							{#}<li><a href="/{{ locale }}/faq"><div>{{ __('faq') }}</div></a></li>#}
 							<li><a href="https://github.com/brainsware/sealas" target="_blank"><div>{{ __('github') }}</div></a></li>
 							<li><a href="/blog/"><div>{{ __('blog') }}</div></a></li>
