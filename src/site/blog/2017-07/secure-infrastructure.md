@@ -8,7 +8,7 @@ Last week we talked about the [application's threat model](/blog/2017-07/sealas-
 Now let's talk about securing our infrastructure.
 
 In general our infrastructure philosophy starts with: The network is hostile.
-This includes our (cloud) providers.
+This includes our ([cloud](https://www.tenfold.com/it-management/cloud-computing-technology)) providers.
 Customer data needs to be readable to us so we know who to bill and how much.
 This data still needs to be protected.
 The technical conclusion to this is that we cannot send data in the clear between any of our services.
