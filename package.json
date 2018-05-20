@@ -17,7 +17,7 @@
     "markdownlint-cli": "^0.8.0",
     "metalsmith": "*",
     "metalsmith-archive": "^0.1.1",
-    "metalsmith-better-excerpts": "^0.1.7",
+    "metalsmith-better-excerpts": "^0.2.1",
     "metalsmith-code-highlight": "^1.0.3",
     "metalsmith-collections": "^0.9.0",
     "metalsmith-define": "^2.0.1",
