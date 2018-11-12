@@ -14,7 +14,7 @@
 
   <link href="{{ static_uri }}/vendor/open-sans-fontface/open-sans.css" rel="stylesheet" type="text/css"/>
 	<link rel="stylesheet" type="text/css" href="{{ static_uri }}/vendor/lato/css/lato.min.css">
-	<link rel="stylesheet" type="text/css" href="{{ static_uri }}/vendor/fonts-raleway/css/raleway.min.css">
+	<link rel="stylesheet" type="text/css" href="{{ static_uri }}/fonts/fonts-raleway/css/raleway.min.css">
 	<link rel="stylesheet" type="text/css" href="{{ static_uri }}/styles/site/font-icons.css?v={{ version }}">
 	<link rel="stylesheet" type="text/css" href="{{ static_uri }}/styles/font/crete/stylesheet.css?v={{ version }}">
 

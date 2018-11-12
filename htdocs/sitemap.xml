@@ -17,20 +17,20 @@
 <url> <loc>https://sealas.at/de/privacy/</loc> </url>
 <url> <loc>https://sealas.at/en/privacy/</loc> </url>
 <url> <loc>https://sealas.at/blog/2017-02/why-we-develop-zero-knowledge-software/</loc> </url>
-<url> <loc>https://sealas.at/blog/2017-07/relaunching-sealas-or-how-i-learned-to-stop-worrying-and-kill-our-product/</loc> </url>
 <url> <loc>https://sealas.at/blog/2017-07/creating-a-secure-cloud-infrastructure/</loc> </url>
+<url> <loc>https://sealas.at/blog/2017-07/relaunching-sealas-or-how-i-learned-to-stop-worrying-and-kill-our-product/</loc> </url>
 <url> <loc>https://sealas.at/blog/2017-07/sealas-threat-model/</loc> </url>
 <url> <loc>https://sealas.at/blog/2017-08/setting-up-a-phoenix-umbrella-app/</loc> </url>
-<url> <loc>https://sealas.at/blog/2017-10/pgp-signed-git-commits-encrypt-verify-made-easy-possible/</loc> </url>
+<url> <loc>https://sealas.at/blog/2017-11/custom-ecto-types/</loc> </url>
 <url> <loc>https://sealas.at/blog/2017-12/tokens-cookies-and-sessions-an-auth-story-part-1/</loc> </url>
-<url> <loc>https://sealas.at/blog/2018-01/encrypted-auth-tokens-for-phoenix-auth-part-2/</loc> </url>
 <url> <loc>https://sealas.at/blog/2018-01/designing-and-writing-a-basic-authentication-api-with-phoenix-and-elixir-auth-part-3/</loc> </url>
+<url> <loc>https://sealas.at/blog/2018-01/encrypted-auth-tokens-for-phoenix-auth-part-2/</loc> </url>
 <url> <loc>https://sealas.at/blog/2018-02/fortifying-apis-timing-attacks/</loc> </url>
 <url> <loc>https://sealas.at/blog/2018-03/translated-e-mails-and-account-verification-with-phoenix-and-swoosh-auth-part-4/</loc> </url>
 <url> <loc>https://sealas.at/blog/2018-05/offline-first-client-side-encryption-and-the-quest-for-a-proper-datastore/</loc> </url>
 <url> <loc>https://sealas.at/blog/2018-04/designing-a-user-system-for-an-encrypted-application-auth-part-0/</loc> </url>
+<url> <loc>https://sealas.at/blog/2017-10/pgp-signed-git-commits-encrypt-verify-made-easy-possible/</loc> </url>
 <url> <loc>https://sealas.at/blog/2017-09/multi-tenant-vs-multi-instance/</loc> </url>
 <url> <loc>https://sealas.at/blog/2017-08/secure-deployment/</loc> </url>
-<url> <loc>https://sealas.at/blog/2017-11/custom-ecto-types/</loc> </url>
 <url> <loc>https://sealas.at/de/home/</loc> </url>
 </urlset>
