@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Offline first, client-side encryption and the quest for a proper datastore - Encrypted online accounting for freelancers with Sealas</title>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta content="width=device-width, initial-scale=1" name="viewport"/>
+
+  <meta name="robots" content="index,follow">
+	<meta name="description" content="Zero Knowledge, Open source, Open development. All data stored encrypted, source code open to everyone, blog journey through the whole development.">
+
+	<link rel="alternate" hreflang="de" href="https://sealas.at/" />
+	<link rel="alternate" hreflang="en" href="https://sealas.at/en" />
+
+  <link href="/vendor/open-sans-fontface/open-sans.css" rel="stylesheet" type="text/css"/>
+	<link rel="stylesheet" type="text/css" href="/vendor/lato/css/lato.min.css">
+	<link rel="stylesheet" type="text/css" href="/vendor/fonts-raleway/css/raleway.min.css">
+	<link rel="stylesheet" type="text/css" href="/styles/site/font-icons.css?v=1004">
+	<link rel="stylesheet" type="text/css" href="/styles/font/crete/stylesheet.css?v=1004">
+
+	<link rel="icon" href="/images/sealas-logo-yellow.png" />
+	<link rel="shortcut icon" href="/images/favicon.ico" />
+
+	<link rel="stylesheet" type="text/css" href="/styles/front.css?v=1004">
+	<link rel="stylesheet" type="text/css" href="/styles/site.css?v=1004">
+
+	
+<meta name="twitter:card"       content="summary">
+<meta name="twitter:site"       content="@sealasapp">
+<meta property="og:url"         content="https://sealas.at/blog/2018-05/offline-first-client-side-encryption-and-the-quest-for-a-proper-datastore/">
+<meta property="og:title"       content="Offline first, client-side encryption and the quest for a proper datastore">
+<meta property="og:type"        content="article">
+<meta property="og:description" content="Permanent storage is something &lt;em&gt;most&lt;/em&gt; applications want to have in one way or another. Selecting the right storage wouldn&#39;t be a choice at all if there weren&#39;t so many options out there, and a lot of these come with their respective advantages and disadvantages.">
+<meta property="og:image"       content="https://sealas.at/images/sealas-logo-white-yellow.png">
+
+
+	</head>
+	
+	
+	
+	
+<body>
+	<header id="header">
+
+			<div id="header-wrap">
+
+				<div class="container clearfix">
+
+					<div id="primary-menu-trigger"><i class="icon-reorder"></i></div>
+					<div id="logo">
+						<a href="/" class="standard-logo" data-dark-logo="images/logo-dark.png"><img src="/images/sealas-logo-white-yellow.png" alt="Encrypted online accounting for freelancers with Sealas"></a>
+						<a href="/" class="retina-logo" data-dark-logo="images/logo-dark@2x.png"><img src="/images/sealas-logo-white-yellow.png" alt="Encrypted online accounting for freelancers with Sealas"></a>
+					</div><!-- #logo end -->
+
+					<nav id="primary-menu">
+						<ul class="one-page-menu sf-js-enabled" style="touch-action: pan-y;">
+							
+							<li><a href="/en/about"><div>About us</div></a></li>
+							
+							
+							<li><a href="https://github.com/brainsware/sealas" target="_blank"><div>github</div></a></li>
+							<li><a href="/blog/"><div>Blog</div></a></li>
+						</ul>
+
+						
+
+						<ul class="one-page-menu sf-js-enabled lang-menu">
+							<li><a><img src="/images/flags/gb.png" alt="en" /> en</a>
+								<ul>
+									<li><a href="/de"><img src="/images/flags/at.png" alt="de" /> de</a></li>
+									<li><a href="/en"><img src="/images/flags/gb.png" alt="en" /> en</a></li>
+								</ul>
+							</li>
+						</ul>
+
+					</nav>
+
+				</div>
+
+			</div>
+
+		</header>
+
+		<div class="clear"></div>
+
+
+<section id="content">
+<div class="content-wrap">
+	<div class="container clearfix">
+		<div class="entry clearfix">
+			<a href="/blog">&laquo; back to blog</a>
+			<div class="entry-title">
+				<h1>Offline first, client-side encryption and the quest for a proper datastore</h1>
+			</div>
+
+			<ul class="entry-meta clearfix">
+				<li><i class="icon-calendar3"></i> 07.05.2018</li>
+			</ul>
+
+			<div class="entry entry-content">
+				<p>Permanent storage is something <em>most</em> applications want to have in one way or another. Selecting the right storage wouldn&apos;t be a choice at all if there weren&apos;t so many options out there, and a lot of these come with their respective advantages and disadvantages.</p>
+<p>The process in principle is always going to be the same:</p>
+<ol>
+<li>Figure out what we need, in a technical and a user experience sense</li>
+<li>Figure out which options could fit our design</li>
+<li>Compare these two sets and select accordingly</li>
+</ol>
+<p>So the first step in figuring out what the correct storage option for our application is, is figuring out what our application is. Without knowing what our application is going to need, we can&apos;t make an informed decision about which path to take.</p>
+<h2 id="requirements">Requirements</h2>
+<p><a href="https://sealas.at" rel="external" target="_blank" class="external">Sealas</a> is at the stage where this question becomes relevant, and so we&apos;ll take it as an example. The user database is already done, and is using a simple single schema Postgres database. The application data is where it gets interesting.</p>
+<p>We have two unique properties of our application we need to take into consideration:</p>
+<ul>
+<li>All our application data is being encrypted on the client before it reaches storage</li>
+<li>We want to have an Offline First application</li>
+</ul>
+<h3 id="client-side-encryption">Client-side encryption</h3>
+<p>One of our goals is to provide a privacy focused application, so our users don&apos;t need to worry about any side effects of using a web application. This would include possible leaks, possible surveillance or any other data aggregation methods.</p>
+<p>Storage wise this means all incoming data is opaque. We can&apos;t manipulate it and we can&apos;t look at it. Another thing we can&apos;t do, is forget that we have other goals as well: the biggest of them is a good user experience. One of the most recognizable aspects of a good user experience is speed, so one of the trade-offs necessary here is with metadata.</p>
+<p>Just because we don&apos;t want to look at the actual contents, doesn&apos;t mean we can&apos;t employ the help of relational data to make searching and selective access easier. Without any meta data, the only available method for searching left would be to always download all data on the client, which would have a significant performance impact.</p>
+<h3 id="offline-first">Offline First</h3>
+<p>Offline First may seem like a buzzword just thrown around to make us feel good.</p>
+<p>Without a closer look at what we actually mean to do with it, this remains true. Again, this is not purely a technical feature, but one that is very much focused on our user experience design. In principle it just means we want to save all data locally before pushing it into some kind of messaging queue to sync it back to the server.</p>
+<p>So what do we want to achieve by adding this capability?</p>
+<p>There are two aspects that are most relevant here: keeping our data in sync when the connection becomes flaky, and providing us with the option for an amazing onboarding experience. Let&apos;s have a closer look:</p>
+<p>#### Connections</p>
+<p>Flaky connections are not only an issue with a moody router or a roommate who all of a sudden decides to download the entire internet. If at any point we want to expand our web application to serve mobile users as well, we reach an entirely different realm of constantly dropping connections. Having a working data sync ready however allows us to keep working with the same code base.</p>
+<p>With a growing set of options to implement mobile apps with JavaScript like <a href="https://www.nativescript.org" rel="external" target="_blank" class="external">NativeScript</a> for Angular and <a href="https://nativescript-vue.org" rel="external" target="_blank" class="external">Vue.JS</a>, or <a href="https://facebook.github.io/react-native/" rel="external" target="_blank" class="external">React Native</a>, this is something to keep in mind.</p>
+<p>User experience wise this also enables something crucial: saving user input across sessions. So even if the browser decides to crash in just the right moment, all work done remains in the browser. Nothing ruins a day more than finding out the hard way that your app doesn&apos;t do automated backups of your work.</p>
+<p>#### Onboarding</p>
+<p>One of the things I want to build and would love to see more often is a seamless transition between demoing a product and actively working with it. Offline First in this case enables us to give the user a clean new working environment to try out the application with their <em>actual</em> data and use-cases, and if they happen to like it, they can create an account to which we can sync the existing data.</p>
+<h2 id="datastore-options">Datastore options</h2>
+<p>Now that we know what we&apos;re dealing with, let&apos;s look at the available options.</p>
+<h3 id="postgres-with-a-multi-tenant-setup">Postgres with a multi tenant setup</h3>
+<p>Since Sealas&apos; backend runs with Elixir and Phoenix, whose default supported database is Postgres, this would be the most natural choice when going for a RDBMS. We didn&apos;t rule out relational data after all, so it makes sense to include it as a viable option.</p>
+<p>Other advantages of using Postgres:</p>
+<ul>
+<li>Very stable and mature product</li>
+<li>Big community and support base around it</li>
+<li>Rich &quot;NoSQL&quot; data support with HStore and JSON support</li>
+</ul>
+<p>Schematic scalability is not that much of an issue for us, since at least the bulk of our data is going to a simple blob whose structure would be changed client-side anyway.</p>
+<h3 id="postgres-with-a-multi-instance-setup">Postgres with a multi instance setup</h3>
+<p>Same argumentation as above with one key difference: every user would get their own database. Having a multi instance setup allows us to completely separate data at a user level. This would allow us to easily add features for each individual user with their own structure. We could also include stricter ACLs for added security.</p>
+<p>Our users&apos; data is encrypted though, so it&apos;s not that much of a concern as it would be otherwise. Apart from that, the setup and maintenance is also a bit more complicated, especially with updates, since every database would need to have their migrations run separately.</p>
+<h3 id="couchdb-pouchdb-">CouchDB (+ PouchDB)</h3>
+<p><a href="https://pouchdb.com" rel="external" target="_blank" class="external">PouchDB </a>is the ready-made solution for Offline First support that an implementation with Postgres would be lacking. It provides you with a database on the browser, which syncs back to a CouchDB instance.</p>
+<p>In CouchDB terms, a connection between two databases is a sync &#x2014; but at the same time it can also be unidirectional to serve as a backup. On the server-side this would make backups absolutely trivial.</p>
+<p>PouchDB even sports backwards compatibility for almost any more modern browser. One of the things that worries me about this option though, is that it&apos;s a very niche project that doesn&apos;t have a lot of traction.</p>
+<h2 id="decisions-decisions">Decisions, decisions</h2>
+<p>CouchDB may seem like the ideal candidate, when focusing only on the sync aspect. But then again there&apos;s no such thing as free lunch and every good thing also has its downsides. The easiest one to point out is that it would make for a heavier tech stack.</p>
+<p>Couch also wants to be your application server, which is even more true in combination with Pouch, as it wants to speak directly to the database. So if you already have an authentication system in place, this might become a pain to integrate.</p>
+<p>Postgres on the other hand doesn&apos;t have a widespread solution for Offline First support ready-made to just plug in and play. There is however one new addition to the world of web development that is getting more and more mature: Service Workers; background scripts that act as proxies between your app and the server, which can access the IndexedDB API for caching.</p>
+<p>Another big plus for a stack with Postgres, is my own level of experience with running applications backed by an RDBMS. Experience building things usually results in more robust code but especially something that gets done way quicker. Then again, you lose out on learning something new.</p>
+<p>In the end pondering only gets you so far, and the one thing that will get things done the easiest is tossing a coin or experimenting with a few prototypes. We would need to find out how easily possible it is to integrate Pouch+Couch into an existing application design and how easy it is to make changes to the way data is saved and partitioned. If that proves too much work, Postgres wins again.</p>
+
+			</div>
+
+			<div class="si-share noborder clearfix">
+				<span>Share this Post:</span>
+				<div>
+					<div id="fb-root"></div>
+					<script>(function(d, s, id) {
+					  var js, fjs = d.getElementsByTagName(s)[0];
+					  if (d.getElementById(id)) return;
+					  js = d.createElement(s); js.id = id;
+					  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+					  fjs.parentNode.insertBefore(js, fjs);
+					}(document, 'script', 'facebook-jssdk'));</script>
+
+						<fb:like href='https://sealas.at/blog/2018-05/offline-first-client-side-encryption-and-the-quest-for-a-proper-datastore/'
+         send='false'
+         layout='button'
+         show_faces=''
+         width='80'
+         action=''
+         font=''
+         colorscheme=''
+         ref='' ></fb:like>
+
+				 <a href="https://twitter.com/share" class="twitter-share-button" data-text="Offline first, client-side encryption and the quest for a proper datastore" data-url="https://sealas.at/blog/2018-05/offline-first-client-side-encryption-and-the-quest-for-a-proper-datastore/" data-via="SealasApp" data-dnt="true" data-show-count="false">Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+				 <!-- Place this tag where you want the +1 button to render. -->
+				<div class="g-plusone" data-size="medium" data-annotation="none" data-callback="https://sealas.at/blog/2018-05/offline-first-client-side-encryption-and-the-quest-for-a-proper-datastore/"></div>
+
+				<!-- Place this tag after the last +1 button tag. -->
+				<script type="text/javascript">
+				  (function() {
+				    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+				    po.src = 'https://apis.google.com/js/platform.js';
+				    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+				  })();
+				</script>
+
+				<script src="//platform.linkedin.com/in.js" type="text/javascript"> lang: en_US</script>
+<script type="IN/Share" data-url="https://sealas.at/blog/2018-05/offline-first-client-side-encryption-and-the-quest-for-a-proper-datastore/"></script>
+				</div>
+			</div>
+
+			<div class="post-navigation clearfix">
+				<div class="col_half nobottommargin">
+					
+					<a href="/blog/2018-04/designing-a-user-system-for-an-encrypted-application-auth-part-0/"><i class="icon-arrow-left"></i> Designing a user system for an encrypted application (Auth Part 0)</a>
+					
+				</div>
+				<div class="col_half col_last tright nobottommargin">
+					
+				</div>
+			</div>
+
+		</div>
+		<div id="section-buy" class="promo promo-border">
+
+	<div class="clearfix">
+
+		<div id="mc_embed_signup" class="widget subscribe-widget clearfix col-md-10 col-md-offset-1">
+			<form action="//sealas.us13.list-manage.com/subscribe/post?u=26cea96bbfb24fbc5f58e314f&amp;id=a92e310c11" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+				<div id="mc_embed_signup_scroll">
+				<h3 style="margin-bottom: 1em;"><span>App development, UX design, business:</span> we're writing about the entire development of Sealas</h3>
+
+				<div class="input-group input-group-lg divcenter">
+					<span class="input-group-addon"><i class="icon-email2"></i></span>
+					<input type="email" value="" required="required" name="EMAIL" class="form-control required email" id="mce-EMAIL" placeholder="Enter your email address here">
+
+					<span class="input-group-btn">
+						<button class="btn btn-success" type="submit">Subscribe</button>
+					</span>
+				</div>
+				<div id="mce-responses" class="clear">
+					<div class="response" id="mce-error-response" style="display:none"></div>
+					<div class="response" id="mce-success-response" style="display:none"></div>
+				</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+					<div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_26cea96bbfb24fbc5f58e314f_a92e310c11" tabindex="-1" value=""></div>
+					<div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+					</div>
+			</form>
+
+			
+		</div>
+	</div>
+
+</div>
+
+	</div>
+
+</div>
+</section>
+
+
+	<footer id="footer" class="dark" style="background: url('/styles/site/images/footer-bg.jpg') repeat fixed; background-size: 100% 100%;">
+
+		<div class="container">
+
+			
+			<div class="footer-widgets-wrap clearfix">
+
+				<div class="col_three_fifth">
+
+					<div class="widget clearfix">
+
+						<img src="/images/sealas-logo-yellow-side.png" alt="Encrypted online accounting for freelancers with Sealas" class="alignleft" id="footer-logo">
+
+						<h3>The <strong>S</strong>ecure <strong>E</strong>asy <strong>A</strong>nd <strong>L</strong>ovely <strong>A</strong>ccounting <strong>S</strong>oftware for freelancers and small businesses.</h3>
+
+						<div class="line" style="margin: 30px 0;"></div>
+						<div class="clearfix" style="padding: 10px 0;">
+							<div class="col_half">
+								<address class="nobottommargin">
+									<abbr title="Headquarters" style="display: inline-block;margin-bottom: 7px;"><strong>Imprint:</strong></abbr><br>
+									Sealas is a service by<br>
+									<a href="https://brainsware.at" target="_blank">Brainsware OG</a><br>
+									Liechtensteinstraße 119/21<br>
+									A-1090 Wien
+								</address>
+							</div>
+							<div class="col_half col_last">
+								<br>ATU68014409<br />
+								HG Wien, FN 330963k<br />
+								<abbr title="Email Address"><strong>Email:</strong></abbr> <a href="mailto:contact@sealas.at">contact@sealas.at</a><br>
+								<abbr title="Web"><strong>Web:</strong></abbr> <a href="https://brainsware.at">https://brainsware.at</a><br>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="col_one_fifth">
+					<div class="bottommargin-sm widget_links">
+						<ul>
+							<li><a href="/">Home</a></li>
+							<li><a href="/en/about">About us</a></li>
+							<li><a href="/#features">Features</a></li>
+							
+							<li><a href="/en/pricing">Pricing</a></li>
+							
+							<li><a href="https://github.com/brainsware/sealas-site">Sealas Website on Github</a></li>
+							<li><a href="https://github.com/brainsware/sealas">Sealas App on Github</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col_one_fifth col_last">
+					<div class="bottommargin-sm widget_links">
+						<ul>
+							<li><a href="/en/blog/"><div>Blog</div></a></li>
+							<li><a href="/en/contact">Contact</a></li>
+							<li><a href="/en/agb">TOS</a></li>
+							<li><a href="/en/privacy">Privacy Policy</a></li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+		
+		<div id="copyrights">
+
+			<div class="container clearfix">
+
+				<div class="col_half">
+					&copy; Brainsware OG
+				</div>
+
+				<div class="col_half col_last tright">
+					<div class="fright clearfix">
+						<a href="https://facebook.com/sealasapp" target="_blank" class="social-icon si-small si-borderless nobottommargin si-facebook">
+							<i class="icon-facebook"></i>
+							<i class="icon-facebook"></i>
+						</a>
+
+						<a href="https://twitter.com/sealasapp" target="_blank" class="social-icon si-small si-borderless nobottommargin si-twitter">
+							<i class="icon-twitter"></i>
+							<i class="icon-twitter"></i>
+						</a>
+
+						
+
+						<a href="https://plus.google.com/+SealasAt" target="_blank" class="social-icon si-small si-borderless nobottommargin si-gplus">
+							<i class="icon-gplus"></i>
+							<i class="icon-gplus"></i>
+						</a>
+
+						<a href="https://www.linkedin.com/company/sealas" target="_blank" class="social-icon si-small si-borderless nobottommargin si-linkedin">
+							<i class="icon-linkedin"></i>
+							<i class="icon-linkedin"></i>
+						</a>
+
+						<a href="https://github.com/brainsware" target="_blank" class="social-icon si-small si-borderless nobottommargin si-github">
+							<i class="icon-github"></i>
+							<i class="icon-github"></i>
+						</a>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+	</footer>
+
+	<script type="text/javascript" src="/site.js">
+	</script>
+
+	<noscript><p><img src="//stats.esotericsystems.at/piwik.php?idsite=13" style="border:0;" alt="" /></p></noscript>
+</body>
+</html>

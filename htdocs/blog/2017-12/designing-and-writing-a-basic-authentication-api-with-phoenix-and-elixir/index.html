@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Designing and writing a basic authentication API with Phoenix and Elixir - Encrypted online accounting for freelancers with Sealas</title>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta content="width=device-width, initial-scale=1" name="viewport"/>
+
+  <meta name="robots" content="index,follow">
+	<meta name="description" content="Zero Knowledge, Open source, Open development. All data stored encrypted, source code open to everyone, blog journey through the whole development.">
+
+	<link rel="alternate" hreflang="de" href="https://sealas.at/" />
+	<link rel="alternate" hreflang="en" href="https://sealas.at/en" />
+
+  <link href="/vendor/open-sans-fontface/open-sans.css" rel="stylesheet" type="text/css"/>
+	<link rel="stylesheet" type="text/css" href="/vendor/lato/css/lato.min.css">
+	<link rel="stylesheet" type="text/css" href="/vendor/fonts-raleway/css/raleway.min.css">
+	<link rel="stylesheet" type="text/css" href="/styles/site/font-icons.css?v=1004">
+	<link rel="stylesheet" type="text/css" href="/styles/font/crete/stylesheet.css?v=1004">
+
+	<link rel="icon" href="/images/sealas-logo-yellow.png" />
+	<link rel="shortcut icon" href="/images/favicon.ico" />
+
+	<link rel="stylesheet" type="text/css" href="/styles/front.css?v=1004">
+	<link rel="stylesheet" type="text/css" href="/styles/site.css?v=1004">
+
+	
+<meta name="twitter:card"       content="summary">
+<meta name="twitter:site"       content="@sealasapp">
+<meta property="og:url"         content="http://sealas.local/blog/2017-12/designing-and-writing-a-basic-authentication-api-with-phoenix-and-elixir/">
+<meta property="og:title"       content="Designing and writing a basic authentication API with Phoenix and Elixir">
+<meta property="og:type"        content="article">
+<meta property="og:description" content="This series is going to be an introduction to writing and developing an authentication process with Phoenix and Elixir in a few parts:">
+<meta property="og:image"       content="http://sealas.local/images/sealas-logo-white-yellow.png">
+
+
+	</head>
+	
+	
+	
+	
+<body>
+	<header id="header">
+
+			<div id="header-wrap">
+
+				<div class="container clearfix">
+
+					<div id="primary-menu-trigger"><i class="icon-reorder"></i></div>
+					<div id="logo">
+						<a href="/" class="standard-logo" data-dark-logo="images/logo-dark.png"><img src="/images/sealas-logo-white-yellow.png" alt="Encrypted online accounting for freelancers with Sealas"></a>
+						<a href="/" class="retina-logo" data-dark-logo="images/logo-dark@2x.png"><img src="/images/sealas-logo-white-yellow.png" alt="Encrypted online accounting for freelancers with Sealas"></a>
+					</div><!-- #logo end -->
+
+					<nav id="primary-menu">
+						<ul class="one-page-menu sf-js-enabled" style="touch-action: pan-y;">
+							
+							<li><a href="/en/about"><div>About us</div></a></li>
+							<li><a href="/en/pricing"><div>Pricing</div></a></li>
+							
+							<li><a href="https://github.com/brainsware/sealas" target="_blank"><div>github</div></a></li>
+							<li><a href="/blog/"><div>Blog</div></a></li>
+						</ul>
+
+						
+
+						<ul class="one-page-menu sf-js-enabled lang-menu">
+							<li><a><img src="/images/flags/gb.png" alt="en" /> en</a>
+								<ul>
+									<li><a href="/de"><img src="/images/flags/at.png" alt="de" /> de</a></li>
+									<li><a href="/en"><img src="/images/flags/gb.png" alt="en" /> en</a></li>
+								</ul>
+							</li>
+						</ul>
+
+					</nav>
+
+				</div>
+
+			</div>
+
+		</header>
+
+		<div class="clear"></div>
+
+
+<section id="content">
+<div class="content-wrap">
+	<div class="container clearfix">
+		<div class="entry clearfix">
+			<a href="/blog">&laquo; back to blog</a>
+			<div class="entry-title">
+				<h1>Designing and writing a basic authentication API with Phoenix and Elixir</h1>
+			</div>
+
+			<ul class="entry-meta clearfix">
+				<li><i class="icon-calendar3"></i> 09.12.2017</li>
+			</ul>
+
+			<div class="entry entry-content">
+				<p>This series is going to be an introduction to writing and developing an authentication process with Phoenix and Elixir in a few parts:</p>
+<ol>
+<li>In part 1 we will cover the most basic necessities for a working authentication</li>
+<li>Part 2 will be cover extending this process with an email verification system</li>
+<li>Last but not least we will add two-factor authentication via Yubikeys</li>
+</ol>
+<p>APIs provide you with resources you need or want in another part of an application, or in another application. In this case we want to provide resources through a REST API to our front-end application. When writing an interface like this, ever so often you happen to want to not give everyone access to everything. So let&apos;s protect it with a layer of authentication!</p>
+<h2 id="packages-and-parts">Packages and parts</h2>
+<p>Our users need to identify themselves via some kind of password/phrase, which at no point ever should be stored as cleartext. To that end, we&apos;re going to use a password hashing library: <a href="https://github.com/riverrun/comeonin" rel="external" target="_blank" class="external">Comeonin</a> with <a href="https://github.com/riverrun/argon2_elixir" rel="external" target="_blank" class="external">Argon2</a>. For those who don&apos;t know, a password hashing library is different from a normal hashing library in that it is as slow as is sensible - depending on the system you&apos;re on.</p>
+<p>On a testing environment however that is not necessary, so to our <code class="hljs arduino"><span class="hljs-built_in">config</span>/test.exs</code> file we can simply add:</p>
+<pre><code class="hljs less"><span class="hljs-attribute">config </span>:argon2_elixir,
+  <span class="hljs-attribute">t_cost</span>: <span class="hljs-number">2</span>,
+  <span class="hljs-attribute">m_cost</span>: <span class="hljs-number">12</span>
+</code></pre><p>With that we have our token storage covered. To make it a bit easier to read our data, I would suggest using <a href="https://github.com/meyercm/base_model" rel="external" target="_blank" class="external">BaseModel</a>, which provides an ActiveRecord like access to your ecto schemas. It removes a lot of overhead when interacting with your data store.</p>
+<p>JOSE, the package we&apos;re going to use for our access tokens is already included by default. So, the additions to our  <code class="hljs css"><span class="hljs-selector-tag">mix</span><span class="hljs-selector-class">.exs</span></code> look like this so far:</p>
+<pre><code class="hljs elixir">{<span class="hljs-symbol">:argon2_elixir</span>, <span class="hljs-string">&quot;~&gt; 1.2&quot;</span>},
+{<span class="hljs-symbol">:comeonin</span>, <span class="hljs-string">&quot;~&gt; 4.0&quot;</span>},
+{<span class="hljs-symbol">:base_model</span>, <span class="hljs-string">&quot;~&gt; 0.2&quot;</span>},
+</code></pre><p>At some point in the future we may want to add other parts to our authentication system, like two-factor authentication or email confirmations, but we&apos;ll leave that for a later step and article.</p>
+<h2 id="what-does-the-structure-look-like-">What does the structure look like?</h2>
+<p>Part of any authentication are three different processes we&apos;re going to have to build:</p>
+<ol>
+<li>Registration for new users</li>
+<li>Login for existing users</li>
+<li>Verification for provided authentication tokens</li>
+</ol>
+<p>We&apos;re definitely going to need to store some user information, and the way to interface to with said store is via a schema. But before we can access a store, we need to create it:</p>
+<pre><code class="hljs stylus">mix ecto<span class="hljs-selector-class">.gen</span><span class="hljs-selector-class">.migration</span> create_users
+</code></pre><p>I&apos;m going to give the user a few more fields and features than just the bare-bones version, containing just an email and password field, but you can simplify or extend from that depending on your needs.</p>
+<pre><code class="hljs sql">defmodule SealasSso.Repo.Migrations.CreateUsers <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">use</span> Ecto.Migration
+
+  <span class="hljs-keyword">def</span> <span class="hljs-keyword">change</span> <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">create</span> <span class="hljs-keyword">table</span>(:<span class="hljs-keyword">users</span>) <span class="hljs-keyword">do</span>
+      <span class="hljs-keyword">add</span> :email,                :<span class="hljs-keyword">string</span>
+      <span class="hljs-keyword">add</span> :<span class="hljs-keyword">password</span>,             :<span class="hljs-keyword">string</span>, <span class="hljs-literal">null</span>: <span class="hljs-literal">true</span>
+      <span class="hljs-keyword">add</span> :password_hint,        :<span class="hljs-keyword">string</span>, <span class="hljs-literal">null</span>: <span class="hljs-literal">true</span>
+      <span class="hljs-keyword">add</span> :active,               :bool,   <span class="hljs-keyword">default</span>: <span class="hljs-literal">false</span>
+      <span class="hljs-keyword">add</span> :activation_code,      :<span class="hljs-keyword">string</span>, <span class="hljs-keyword">size</span>: <span class="hljs-number">32</span>, <span class="hljs-literal">null</span>: <span class="hljs-literal">true</span>
+
+      timestamps()
+    <span class="hljs-keyword">end</span>
+
+    <span class="hljs-keyword">create</span> unique_index(:<span class="hljs-keyword">users</span>, [:email])
+
+  <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">end</span>
+</code></pre><p>Let&apos;s go over these fields, to make sure we&apos;re all on the same page: For this case <code class="hljs ebnf"><span class="hljs-attribute">email</span></code> is the identification token and gets a <code class="hljs">unique_index</code> attached to it.</p>
+<p>The password is just a normal text field, but will of course never store a cleartext password. It is allowed to have a <code class="hljs yaml"><span class="hljs-literal">null</span></code> value, because the registration in Sealas is set up as a two-step process. First you enter your email address, which you then verify and set your password. I will go into more detail about this in a later post.</p>
+<p>This includes the reason for the <code class="hljs ebnf"><span class="hljs-attribute">active</span></code> and <code class="hljs">activation_code</code> fields. By default a user is deactivated and gets an activation code attached and sent out by email on creation. For simplicity&apos;s sake we&apos;ll skip this part for now, but keep the fields in as a reminder. I&apos;ll expand on this part in the next post.</p>
+<p>With our migration set, we can go ahead and create a corresponding schema definition.</p>
+<pre><code class="hljs sql">defmodule SealasSso.Accounts.User <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">use</span> BaseModel, repo: SealasSso.Repo
+  <span class="hljs-keyword">import</span> Ecto.Changeset
+
+  <span class="hljs-keyword">alias</span> SealasSso.Accounts.User
+
+  <span class="hljs-keyword">schema</span> <span class="hljs-string">&quot;users&quot;</span> <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">field</span> :email,                :<span class="hljs-keyword">string</span>
+    <span class="hljs-keyword">field</span> :<span class="hljs-keyword">password</span>,             EctoHashedPassword
+    <span class="hljs-keyword">field</span> :password_hint,        :<span class="hljs-keyword">string</span>
+    <span class="hljs-keyword">field</span> :active,               :<span class="hljs-built_in">boolean</span>, <span class="hljs-keyword">default</span>: <span class="hljs-literal">false</span>
+    <span class="hljs-keyword">field</span> :activation_code,      :<span class="hljs-keyword">string</span>
+
+    timestamps()
+  <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">end</span>
+</code></pre><p>At the top of the file we <code class="hljs actionscript"><span class="hljs-keyword">use</span> BaseModel</code> and tell it the repo file we&apos;re using. The schema mirrors our migration file except for <code class="hljs ebnf"><span class="hljs-attribute">EctoHashedPassword</span></code> , which automatically transforms all input into its hashed form. <a href="https://sealas.at/blog/2017-11/custom-ecto-types/">I wrote another post explaining custom ecto types using another type as an example</a>, so I will only add an abbreviated version here.</p>
+<h2 id="custom-password-type">Custom password type</h2>
+<p>The base for our custom type will be a string, since we&apos;re going to save the hash as a string to the database. This makes the whole procedure very simple, as we&apos;re going to base our type on the string ecto type.</p>
+<pre><code class="hljs sql">defmodule SealasSso.EctoHashedPasswordTest <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">use</span> SealasSso.DataCase
+
+  <span class="hljs-keyword">describe</span> <span class="hljs-string">&quot;casting custom ecto hashed password&quot;</span> <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">test</span> <span class="hljs-string">&quot;type&quot;</span>, <span class="hljs-keyword">do</span>: assert EctoHashedPassword.type == :<span class="hljs-keyword">string</span>
+
+    <span class="hljs-keyword">test</span> <span class="hljs-string">&quot;cast and verify&quot;</span> <span class="hljs-keyword">do</span>
+      assert {:ok, <span class="hljs-keyword">hash</span>} = EctoHashedPassword.cast(<span class="hljs-string">&quot;test_password&quot;</span>)
+
+      assert EctoHashedPassword.checkpw(<span class="hljs-string">&quot;test_password&quot;</span>, <span class="hljs-keyword">hash</span>)
+      assert !EctoHashedPassword.checkpw(<span class="hljs-string">&quot;wrong_password&quot;</span>, <span class="hljs-keyword">hash</span>)
+    <span class="hljs-keyword">end</span>
+  <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">end</span>
+</code></pre><p>Since we inherit most functionality from ecto&apos;s native type, we can focus on testing what we would add: the cast function hashing our input and an interface to the verification function of the hash of our choice.</p>
+<pre><code class="hljs sql">defmodule EctoHashedPassword <span class="hljs-keyword">do</span>
+  @behaviour Ecto.Type
+  <span class="hljs-keyword">def</span> <span class="hljs-keyword">type</span>, <span class="hljs-keyword">do</span>: :<span class="hljs-keyword">string</span>
+
+  @doc <span class="hljs-string">&quot;&quot;&quot;
+  Hash password with currenly used hashing algorithm
+  &quot;&quot;&quot;</span>
+  <span class="hljs-keyword">def</span> <span class="hljs-keyword">cast</span>(<span class="hljs-keyword">password</span>) <span class="hljs-keyword">when</span> is_binary(<span class="hljs-keyword">password</span>), <span class="hljs-keyword">do</span>: {:ok, Comeonin.Argon2.hashpwsalt(<span class="hljs-keyword">password</span>)}
+  <span class="hljs-keyword">def</span> <span class="hljs-keyword">cast</span>(_), <span class="hljs-keyword">do</span>: :<span class="hljs-keyword">error</span>
+
+  <span class="hljs-keyword">def</span> <span class="hljs-keyword">load</span>(<span class="hljs-keyword">password</span>) <span class="hljs-keyword">when</span> is_binary(<span class="hljs-keyword">password</span>), <span class="hljs-keyword">do</span>: {:ok, <span class="hljs-keyword">password</span>}
+  <span class="hljs-keyword">def</span> <span class="hljs-keyword">load</span>(_), <span class="hljs-keyword">do</span>: :<span class="hljs-keyword">error</span>
+
+  <span class="hljs-keyword">def</span> dump(<span class="hljs-keyword">password</span>) <span class="hljs-keyword">when</span> is_binary(<span class="hljs-keyword">password</span>), <span class="hljs-keyword">do</span>: {:ok, <span class="hljs-keyword">password</span>}
+  <span class="hljs-keyword">def</span> dump(_), <span class="hljs-keyword">do</span>: :<span class="hljs-keyword">error</span>
+
+  @doc <span class="hljs-string">&quot;&quot;&quot;
+  Check password against hash with currently used hashing algorithm.
+  &quot;&quot;&quot;</span>
+  @spec checkpw(String.t, String.t) :: <span class="hljs-built_in">boolean</span>
+  <span class="hljs-keyword">def</span> checkpw(<span class="hljs-keyword">password</span>, <span class="hljs-keyword">hash</span>), <span class="hljs-keyword">do</span>: Comeonin.Argon2.checkpw(<span class="hljs-keyword">password</span>, <span class="hljs-keyword">hash</span>)
+<span class="hljs-keyword">end</span>
+</code></pre><p>Since we use Argon2 we implement our type with that. If at any point we want to change the hashing function to something else, we have it consolidated in one place where we can then simply exchange it. Almost simply. To ensure not breaking anything, let&apos;s add a test verifying that even in case of a future hash change, our previously stored Argon2 hashes still get verified.</p>
+<pre><code class="hljs less"><span class="hljs-variable">@argon2_hash</span> <span class="hljs-string">&quot;$argon2i$v=19$m=65536,t=6,p=1$79ljDB93b7A3W4LsbyoI2A$yiYBzrw1OaQiS86YESKTrwh8l9NnsUpbugddemKPv0w&quot;</span>
+
+test <span class="hljs-string">&quot;verify argon2 hash&quot;</span>, <span class="hljs-attribute">do</span>: assert EctoHashedPassword.checkpw(<span class="hljs-string">&quot;test_password&quot;</span>, <span class="hljs-variable">@argon2_hash</span>)
+</code></pre><p>Now that we have our migration, schema and type done, we can move on to the controller part.</p>
+<h2 id="let-s-write-some-tests">Let&apos;s write some tests</h2>
+<p>to find out and define what we&apos;re going to expect our authentication to look and behave like.</p>
+<pre><code class="hljs less"><span class="hljs-selector-tag">defmodule</span> <span class="hljs-selector-tag">SealasSso</span><span class="hljs-selector-class">.AuthControllerTest</span> <span class="hljs-selector-tag">do</span>
+  <span class="hljs-selector-tag">use</span> <span class="hljs-selector-tag">SealasSso</span><span class="hljs-selector-class">.ConnCase</span>
+
+  <span class="hljs-selector-tag">alias</span> <span class="hljs-selector-tag">SealasSso</span><span class="hljs-selector-class">.Repo</span>
+  <span class="hljs-selector-tag">alias</span> <span class="hljs-selector-tag">SealasSso</span><span class="hljs-selector-class">.Accounts</span><span class="hljs-selector-class">.User</span>
+
+  @<span class="hljs-selector-tag">create_attrs</span> %{<span class="hljs-attribute">email</span>: <span class="hljs-string">&quot;some@email.com&quot;</span>, <span class="hljs-attribute">password</span>: <span class="hljs-string">&quot;some password&quot;</span>, <span class="hljs-attribute">active</span>: true}
+  <span class="hljs-variable">@valid_login</span>  %{<span class="hljs-attribute">email</span>: <span class="hljs-string">&quot;some@email.com&quot;</span>, <span class="hljs-attribute">password</span>: <span class="hljs-string">&quot;some password&quot;</span>}
+  <span class="hljs-variable">@failed_login</span> %{<span class="hljs-attribute">email</span>: <span class="hljs-string">&quot;some@email.com&quot;</span>, <span class="hljs-attribute">password</span>: <span class="hljs-string">&quot;wrong password&quot;</span>}
+
+  <span class="hljs-selector-tag">def</span> <span class="hljs-selector-tag">fixture</span>(:user) <span class="hljs-selector-tag">do</span>
+    {<span class="hljs-selector-pseudo">:ok</span>, <span class="hljs-selector-tag">user</span>} = %User{}
+      |&gt; User.create_test_changeset(<span class="hljs-variable">@create_attrs</span>)
+      |&gt; Repo.insert()
+    user
+  end
+
+  setup %{<span class="hljs-attribute">conn</span>: conn} <span class="hljs-selector-tag">do</span>
+    {<span class="hljs-selector-pseudo">:ok</span>, <span class="hljs-selector-tag">conn</span>: <span class="hljs-selector-tag">put_req_header</span>(conn, <span class="hljs-string">&quot;accept&quot;</span>, <span class="hljs-string">&quot;application/json&quot;</span>)}
+  end
+
+  defp create_user(_) do
+    user = fixture(:user)
+    {<span class="hljs-selector-pseudo">:ok</span>, <span class="hljs-selector-tag">user</span>: <span class="hljs-selector-tag">user</span>}
+  end
+end
+</code></pre><p>You&apos;ll notice that our passwords are <em>very</em> simple. The password&apos;s complexity-check happens on the frontend, in JavaScript. The frontend in its finished state will never actually send a cleartext password to the backend to perform any such test on it. This double hashing reduces the likelihood of a leak at any stage of the process.</p>
+<p>With this we have set up some test data and setup functions for creating users to test our access with. Next we can go on and define our actual use cases.</p>
+<p>What do we want a successful login to look like?</p>
+<pre><code class="hljs sql">  <span class="hljs-keyword">describe</span> <span class="hljs-string">&quot;login&quot;</span> <span class="hljs-keyword">do</span>
+    setup [:create_user]
+
+    <span class="hljs-keyword">test</span> <span class="hljs-string">&quot;successful authentication as a user&quot;</span>, %{<span class="hljs-keyword">conn</span>: <span class="hljs-keyword">conn</span>} <span class="hljs-keyword">do</span>
+      <span class="hljs-keyword">conn</span> = <span class="hljs-keyword">get</span> <span class="hljs-keyword">conn</span>, auth_path(<span class="hljs-keyword">conn</span>, :<span class="hljs-keyword">index</span>), @create_attrs
+      assert %{<span class="hljs-string">&quot;auth&quot;</span> =&gt; auth_token} = json_response(<span class="hljs-keyword">conn</span>, <span class="hljs-number">201</span>)
+
+      assert {:ok, token} = SealasSso.Router.decrypt_token(auth_token)
+
+      {:ok, token_creatd_at} = DateTime.from_unix(token.fields[<span class="hljs-string">&quot;created_at&quot;</span>])
+      assert DateTime.diff(DateTime.utc_now(), token_creatd_at) &gt;= <span class="hljs-number">0</span>
+
+      <span class="hljs-keyword">conn</span> = <span class="hljs-keyword">conn</span>
+      |&gt; <span class="hljs-keyword">recycle</span>()
+      |&gt; put_req_header(<span class="hljs-string">&quot;authorization&quot;</span>, <span class="hljs-string">&quot;bearer: &quot;</span> &lt;&gt; auth_token)
+      |&gt; <span class="hljs-keyword">get</span>(user_path(<span class="hljs-keyword">conn</span>, :<span class="hljs-keyword">index</span>))
+
+      assert json_response(<span class="hljs-keyword">conn</span>, <span class="hljs-number">200</span>)
+    <span class="hljs-keyword">end</span>
+  <span class="hljs-keyword">end</span>
+</code></pre><p>The most important part here is actually the first two lines of the test:</p>
+<pre><code class="hljs dart">conn = <span class="hljs-keyword">get</span> conn, auth_path(conn, :index), <span class="hljs-meta">@valid</span>_login
+<span class="hljs-keyword">assert</span> %{<span class="hljs-string">&quot;auth&quot;</span> =&gt; auth_token} = json_response(conn, <span class="hljs-number">201</span>)
+</code></pre><p>Accessing the <code class="hljs">auth_path</code> route should give us a 201 HTTP code response, which stands for &quot;Resoure created&quot;, and give us back a token we can use to authenticate in further requests. Then we go on to validate the token with a separate function, and finally go on and try to access a protected route with it.</p>
+<p>All that&apos;s missing is covering failure states; failed authentication because of bad credentials, and refused access for a protected route.</p>
+<pre><code class="hljs coq">    test <span class="hljs-string">&quot;fail to authenticate with wrong password&quot;</span>, %{conn: conn} <span class="hljs-built_in">do</span>
+      conn = get conn, auth_path(conn, :index), @failed_login
+      <span class="hljs-built_in">assert</span> json_response(conn, <span class="hljs-number">401</span>) == %{<span class="hljs-string">&quot;error&quot;</span> =&gt; <span class="hljs-string">&quot;auth fail&quot;</span>}
+    <span class="hljs-keyword">end</span>
+
+    test <span class="hljs-string">&quot;get 401 for protected route&quot;</span>, %{conn: conn} <span class="hljs-built_in">do</span>
+      conn = conn |<span class="hljs-type">&gt; get</span>(user_path(conn, :index))
+
+      <span class="hljs-built_in">assert</span> json_response(conn, <span class="hljs-number">401</span>) == %{<span class="hljs-string">&quot;error&quot;</span> =&gt; <span class="hljs-string">&quot;auth fail&quot;</span>}
+    <span class="hljs-keyword">end</span>
+</code></pre><p>This covers our basic usage cases for a login, so:</p>
+<h2 id="let-s-implement-it-">Let&apos;s implement it!</h2>
+<p>Knowing what our authentication controller is supposed to do, this is pretty straight forward:</p>
+<pre><code class="hljs routeros">defmodule SealasSso.AuthController <span class="hljs-keyword">do</span>
+  use SealasSso, :controller
+
+  alias SealasSso.Accounts.User
+  alias SealasSso.Repo
+
+  @spec index(Plug.Conn.t, %{email: String.t, password: String.t}) :: Plug.Conn.t
+  def index(conn, %{<span class="hljs-string">&quot;email&quot;</span> =&gt; email, <span class="hljs-string">&quot;password&quot;</span> =&gt; password}) <span class="hljs-keyword">do</span>
+   <span class="hljs-built_in"> user </span>= User.first(email: email)
+
+    cond <span class="hljs-keyword">do</span>
+     <span class="hljs-built_in"> user </span>&amp;&amp; user.active &amp;&amp; EctoHashedPassword.checkpw(password, user.password) -&gt;
+        conn
+        |&gt; put_status(:created) # http 201
+        |&gt; render(<span class="hljs-string">&quot;auth.json&quot;</span>, %{auth: generate_token(user)})
+      <span class="hljs-literal">true</span> -&gt;
+        conn
+        |&gt; put_status(:unauthorized) # http 401
+        |&gt; render(<span class="hljs-string">&quot;error.json&quot;</span>)
+  end
+end
+</code></pre><p>We only have two conditions here that will suffice our test cases: A successful login, and a catch-all <code class="hljs ebnf"><span class="hljs-attribute">unauthorized</span></code> error. If the user exists, is active and has a matching password we can go ahead and generate an authentication token.</p>
+<p>The requirements for generating a token are documented in the <a href="https://hexdocs.pm/jose/JOSE.html" rel="external" target="_blank" class="external">JOSE docs</a>. From that we can gather that we need to generate a key</p>
+<p>We need at least two bits of information for a usable token: the time of creation, and which user we validated in the authentication process. Since the only external information is extracted from the user object, we can just pass that as an argument.</p>
+<pre><code class="hljs elixir">  <span class="hljs-variable">@spec</span> generate_token(%User{}) <span class="hljs-symbol">:</span>: String.t
+  <span class="hljs-function"><span class="hljs-keyword">defp</span> <span class="hljs-title">generate_token</span></span>(user) <span class="hljs-keyword">do</span>
+    key = Application.get_env(<span class="hljs-symbol">:sealas_sso</span>, SealasSso.Endpoint)[<span class="hljs-symbol">:token_key</span>]
+
+    jwk = %{<span class="hljs-string">&quot;kty&quot;</span> =&gt; <span class="hljs-string">&quot;oct&quot;</span>, <span class="hljs-string">&quot;k&quot;</span> =&gt; <span class="hljs-symbol">:base64url</span>.encode(key)}
+    jws = %{<span class="hljs-string">&quot;alg&quot;</span> =&gt; <span class="hljs-string">&quot;HS256&quot;</span>}
+
+    token_content = %{<span class="hljs-symbol">created_at:</span> DateTime.to_unix(DateTime.utc_now()), <span class="hljs-symbol">id:</span> user.id}
+
+    {%{<span class="hljs-symbol">alg:</span> <span class="hljs-symbol">:jose_jws_alg_hmac</span>}, token} = JOSE.JWS.compact JOSE.JWT.sign(jwk, jws, token_content)
+
+    token
+  <span class="hljs-keyword">end</span>
+</code></pre><h2 id="timing-attacks-">Timing attacks?</h2>
+<p>A potential attacker will use any bit of information available; for example, the time it takes to resolve a request to a login or registration process can tell you whether a user has been found, whether the password check has been done, etc. since all of these take up a different amount of time.</p>
+<p>The simplest solution to this problem is to delay all requests to your user/authentication system to an amount of time that is longer than any kind of request handling would take, but is still unnoticeable for the user. In this case I have set it to 200ms, which is more than enough time for any checks, yet is still fast enough for a response from an API.</p>
+<p>Let&apos;s test for this in our authentication test suite:</p>
+<pre><code class="hljs sql">  @minimum_request_time 190_000
+
+  <span class="hljs-keyword">describe</span> <span class="hljs-string">&quot;sso timing&quot;</span> <span class="hljs-keyword">do</span>
+    <span class="hljs-keyword">test</span> <span class="hljs-string">&quot;minimum request time&quot;</span>, %{<span class="hljs-keyword">conn</span>: <span class="hljs-keyword">conn</span>} <span class="hljs-keyword">do</span>
+      <span class="hljs-keyword">time</span> = Time.utc_now()
+
+      <span class="hljs-keyword">get</span> <span class="hljs-keyword">conn</span>, auth_path(<span class="hljs-keyword">conn</span>, :<span class="hljs-keyword">index</span>), @failed_login
+
+      diff = Time.diff(Time.utc_now(), <span class="hljs-keyword">time</span>, :<span class="hljs-keyword">microsecond</span>)
+      assert diff &gt;= @minimum_request_time
+    <span class="hljs-keyword">end</span>
+  <span class="hljs-keyword">end</span>
+</code></pre><p>Now we any request to the authentication route needs to take at least <code class="hljs aspectj"><span class="hljs-meta">@minimum</span>_request_time</code> amount of time in ms. This is not set to 200ms because I found that the way the test environment execution works would sometimes reduce this slightly below 200ms even if the proper wait time should be there.</p>
+<p>In the router we can then add a plug to handle our needed time delay:</p>
+<pre><code class="hljs less">  <span class="hljs-variable">@minimum_request_time</span> <span class="hljs-number">200</span>_000
+
+  <span class="hljs-attribute">pipeline </span>:delayed_request do
+    <span class="hljs-attribute">plug </span>:request_timer, <span class="hljs-variable">@minimum_request_time</span>
+  end
+
+  <span class="hljs-variable">@spec</span> request_timer(Plug.Conn.t, integer) :: Plug.Conn.t
+  def request_timer(conn, minimum_request_time \\ <span class="hljs-number">200</span>_000) do
+    time = Time.utc_now()
+
+    Conn.register_before_send(conn, fn conn -&gt;
+      diff = Time.diff(Time.utc_now(), time, :microsecond)
+
+      if diff &lt; minimum_request_time, <span class="hljs-attribute">do</span>: :timer.sleep round((minimum_request_time - diff)/<span class="hljs-number">1000</span>)
+      conn
+    end)
+  end
+</code></pre><p><code class="hljs stylus">Plug<span class="hljs-selector-class">.Conn</span><span class="hljs-selector-class">.register_before_send</span></code> allows us to register a function that will execute before sending the result to the client. In our registered function we check for the time difference between when the function has been registered and before it is being executed and waits for the difference.</p>
+<p>For this to work we plug in our plug into our desired routes.</p>
+<pre><code class="hljs elixir">  scope <span class="hljs-string">&quot;/&quot;</span>, SealasSso <span class="hljs-keyword">do</span>  
+    pipe_through <span class="hljs-symbol">:delayed_request</span>
+    pipe_through <span class="hljs-symbol">:api</span>
+
+    get  <span class="hljs-string">&quot;/auth&quot;</span>, AuthController, <span class="hljs-symbol">:index</span>
+  <span class="hljs-keyword">end</span>
+</code></pre><p>That&apos;s it for now! Next time we&apos;ll tackle verification by email, so stay tuned.</p>
+
+			</div>
+
+			<div class="si-share noborder clearfix">
+				<span>Share this Post:</span>
+				<div>
+					<div id="fb-root"></div>
+					<script>(function(d, s, id) {
+					  var js, fjs = d.getElementsByTagName(s)[0];
+					  if (d.getElementById(id)) return;
+					  js = d.createElement(s); js.id = id;
+					  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+					  fjs.parentNode.insertBefore(js, fjs);
+					}(document, 'script', 'facebook-jssdk'));</script>
+
+						<fb:like href='http://sealas.local/blog/2017-12/designing-and-writing-a-basic-authentication-api-with-phoenix-and-elixir/'
+         send='false'
+         layout='button'
+         show_faces=''
+         width='80'
+         action=''
+         font=''
+         colorscheme=''
+         ref='' ></fb:like>
+
+				 <a href="https://twitter.com/share" class="twitter-share-button" data-text="Designing and writing a basic authentication API with Phoenix and Elixir" data-url="http://sealas.local/blog/2017-12/designing-and-writing-a-basic-authentication-api-with-phoenix-and-elixir/" data-via="SealasApp" data-dnt="true" data-show-count="false">Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+				 <!-- Place this tag where you want the +1 button to render. -->
+				<div class="g-plusone" data-size="medium" data-annotation="none" data-callback="http://sealas.local/blog/2017-12/designing-and-writing-a-basic-authentication-api-with-phoenix-and-elixir/"></div>
+
+				<!-- Place this tag after the last +1 button tag. -->
+				<script type="text/javascript">
+				  (function() {
+				    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+				    po.src = 'https://apis.google.com/js/platform.js';
+				    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+				  })();
+				</script>
+
+				<script src="//platform.linkedin.com/in.js" type="text/javascript"> lang: en_US</script>
+<script type="IN/Share" data-url="http://sealas.local/blog/2017-12/designing-and-writing-a-basic-authentication-api-with-phoenix-and-elixir/"></script>
+				</div>
+			</div>
+
+			<div class="post-navigation clearfix">
+				<div class="col_half nobottommargin">
+					
+					<a href="/blog/2017-11/custom-ecto-types/"><i class="icon-arrow-left"></i> Custom ecto types</a>
+					
+				</div>
+				<div class="col_half col_last tright nobottommargin">
+					
+					<a href="/blog/2017-12/tokens-cookies-and-sessions-an-auth-story-part-1/">Tokens, cookies and sessions: an auth story (Part 1) <i class="icon-arrow-right"></i></a>
+					
+				</div>
+			</div>
+
+		</div>
+		<div id="section-buy" class="promo promo-border">
+
+	<div class="clearfix">
+
+		<div id="mc_embed_signup" class="widget subscribe-widget clearfix col-md-10 col-md-offset-1">
+			<form action="//sealas.us13.list-manage.com/subscribe/post?u=26cea96bbfb24fbc5f58e314f&amp;id=a92e310c11" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+				<div id="mc_embed_signup_scroll">
+				<h3 style="margin-bottom: 1em;"><span>App development, UX design, business:</span> we're writing about the entire development of Sealas</h3>
+
+				<div class="input-group input-group-lg divcenter">
+					<span class="input-group-addon"><i class="icon-email2"></i></span>
+					<input type="email" value="" required="required" name="EMAIL" class="form-control required email" id="mce-EMAIL" placeholder="Enter your email address here">
+
+					<span class="input-group-btn">
+						<button class="btn btn-success" type="submit">Subscribe</button>
+					</span>
+				</div>
+				<div id="mce-responses" class="clear">
+					<div class="response" id="mce-error-response" style="display:none"></div>
+					<div class="response" id="mce-success-response" style="display:none"></div>
+				</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+					<div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_26cea96bbfb24fbc5f58e314f_a92e310c11" tabindex="-1" value=""></div>
+					<div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+					</div>
+			</form>
+
+			
+		</div>
+	</div>
+
+</div>
+
+	</div>
+
+</div>
+</section>
+
+
+	<footer id="footer" class="dark" style="background: url('/styles/site/images/footer-bg.jpg') repeat fixed; background-size: 100% 100%;">
+
+		<div class="container">
+
+			
+			<div class="footer-widgets-wrap clearfix">
+
+				<div class="col_three_fifth">
+
+					<div class="widget clearfix">
+
+						<img src="/images/sealas-logo-yellow-side.png" alt="Encrypted online accounting for freelancers with Sealas" class="alignleft" id="footer-logo">
+
+						<h3>The <strong>S</strong>ecure <strong>E</strong>asy <strong>A</strong>nd <strong>L</strong>ovely <strong>A</strong>ccounting <strong>S</strong>oftware for freelancers and small businesses.</h3>
+
+						<div class="line" style="margin: 30px 0;"></div>
+						<div class="clearfix" style="padding: 10px 0;">
+							<div class="col_half">
+								<address class="nobottommargin">
+									<abbr title="Headquarters" style="display: inline-block;margin-bottom: 7px;"><strong>Imprint:</strong></abbr><br>
+									Sealas is a service by<br>
+									<a href="https://brainsware.at" target="_blank">Brainsware OG</a><br>
+									Liechtensteinstraße 119/21<br>
+									A-1090 Wien
+								</address>
+							</div>
+							<div class="col_half col_last">
+								<br>ATU68014409<br />
+								HG Wien, FN 330963k<br />
+								<abbr title="Email Address"><strong>Email:</strong></abbr> <a href="mailto:contact@sealas.at">contact@sealas.at</a><br>
+								<abbr title="Web"><strong>Web:</strong></abbr> <a href="https://brainsware.at">https://brainsware.at</a><br>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="col_one_fifth">
+					<div class="bottommargin-sm widget_links">
+						<ul>
+							<li><a href="/">Home</a></li>
+							<li><a href="/en/about">About us</a></li>
+							<li><a href="/#features">Features</a></li>
+							
+							<li><a href="/en/pricing">Pricing</a></li>
+							
+							<li><a href="https://github.com/brainsware/sealas-site">Sealas Website on Github</a></li>
+							<li><a href="https://github.com/brainsware/sealas">Sealas App on Github</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col_one_fifth col_last">
+					<div class="bottommargin-sm widget_links">
+						<ul>
+							<li><a href="/en/blog/"><div>Blog</div></a></li>
+							<li><a href="/en/contact">Contact</a></li>
+							<li><a href="/en/agb">TOS</a></li>
+							<li><a href="/en/privacy">Privacy Policy</a></li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+		
+		<div id="copyrights">
+
+			<div class="container clearfix">
+
+				<div class="col_half">
+					&copy; Brainsware OG
+				</div>
+
+				<div class="col_half col_last tright">
+					<div class="fright clearfix">
+						<a href="https://facebook.com/sealasapp" target="_blank" class="social-icon si-small si-borderless nobottommargin si-facebook">
+							<i class="icon-facebook"></i>
+							<i class="icon-facebook"></i>
+						</a>
+
+						<a href="https://twitter.com/sealasapp" target="_blank" class="social-icon si-small si-borderless nobottommargin si-twitter">
+							<i class="icon-twitter"></i>
+							<i class="icon-twitter"></i>
+						</a>
+
+						
+
+						<a href="https://plus.google.com/+SealasAt" target="_blank" class="social-icon si-small si-borderless nobottommargin si-gplus">
+							<i class="icon-gplus"></i>
+							<i class="icon-gplus"></i>
+						</a>
+
+						<a href="https://www.linkedin.com/company/sealas" target="_blank" class="social-icon si-small si-borderless nobottommargin si-linkedin">
+							<i class="icon-linkedin"></i>
+							<i class="icon-linkedin"></i>
+						</a>
+
+						<a href="https://github.com/brainsware" target="_blank" class="social-icon si-small si-borderless nobottommargin si-github">
+							<i class="icon-github"></i>
+							<i class="icon-github"></i>
+						</a>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+	</footer>
+
+	<script type="text/javascript" src="/site.js">
+	</script>
+
+	<noscript><p><img src="//stats.esotericsystems.at/piwik.php?idsite=13" style="border:0;" alt="" /></p></noscript>
+</body>
+</html>

@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Translated E-Mails and Account Verification with Phoenix and Swoosh (Auth Part 4) - Encrypted online accounting for freelancers with Sealas</title>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta content="width=device-width, initial-scale=1" name="viewport"/>
+
+  <meta name="robots" content="index,follow">
+	<meta name="description" content="Zero Knowledge, Open source, Open development. All data stored encrypted, source code open to everyone, blog journey through the whole development.">
+
+	<link rel="alternate" hreflang="de" href="https://sealas.at/" />
+	<link rel="alternate" hreflang="en" href="https://sealas.at/en" />
+
+  <link href="/vendor/open-sans-fontface/open-sans.css" rel="stylesheet" type="text/css"/>
+	<link rel="stylesheet" type="text/css" href="/vendor/lato/css/lato.min.css">
+	<link rel="stylesheet" type="text/css" href="/vendor/fonts-raleway/css/raleway.min.css">
+	<link rel="stylesheet" type="text/css" href="/styles/site/font-icons.css?v=1004">
+	<link rel="stylesheet" type="text/css" href="/styles/font/crete/stylesheet.css?v=1004">
+
+	<link rel="icon" href="/images/sealas-logo-yellow.png" />
+	<link rel="shortcut icon" href="/images/favicon.ico" />
+
+	<link rel="stylesheet" type="text/css" href="/styles/front.css?v=1004">
+	<link rel="stylesheet" type="text/css" href="/styles/site.css?v=1004">
+
+	
+<meta name="twitter:card"       content="summary">
+<meta name="twitter:site"       content="@sealasapp">
+<meta property="og:url"         content="https://sealas.at/blog/2018-03/translated-e-mails-and-account-verification-with-phoenix-and-swoosh-auth-part-4/">
+<meta property="og:title"       content="Translated E-Mails and Account Verification with Phoenix and Swoosh (Auth Part 4)">
+<meta property="og:type"        content="article">
+<meta property="og:description" content="We&#39;re really starting to get to know each other, hm? Having gone through writing an auth token library in parts &lt;a href=&quot;/blog/2017-12/tokens-cookies-and-sessions-an-auth-story-part-1/&quot;&gt;1&lt;/a&gt; and &lt;a href=&quot;/blog/2018-01/encrypted-auth-tokens-for-phoenix-auth-part-2/&quot;&gt;2&lt;/a&gt;, and the first steps towards protecting our API with an auth process in part &lt;a href=&quot;/blog/2018-01/designing-and-writing-a-basic-authentication-api-with-phoenix-and-elixir-auth-part-3/&quot;&gt;3&lt;/a&gt;.">
+<meta property="og:image"       content="https://sealas.at/images/sealas-logo-white-yellow.png">
+
+
+	</head>
+	
+	
+	
+	
+<body>
+	<header id="header">
+
+			<div id="header-wrap">
+
+				<div class="container clearfix">
+
+					<div id="primary-menu-trigger"><i class="icon-reorder"></i></div>
+					<div id="logo">
+						<a href="/" class="standard-logo" data-dark-logo="images/logo-dark.png"><img src="/images/sealas-logo-white-yellow.png" alt="Encrypted online accounting for freelancers with Sealas"></a>
+						<a href="/" class="retina-logo" data-dark-logo="images/logo-dark@2x.png"><img src="/images/sealas-logo-white-yellow.png" alt="Encrypted online accounting for freelancers with Sealas"></a>
+					</div><!-- #logo end -->
+
+					<nav id="primary-menu">
+						<ul class="one-page-menu sf-js-enabled" style="touch-action: pan-y;">
+							
+							<li><a href="/en/about"><div>About us</div></a></li>
+							
+							
+							<li><a href="https://github.com/brainsware/sealas" target="_blank"><div>github</div></a></li>
+							<li><a href="/blog/"><div>Blog</div></a></li>
+						</ul>
+
+						
+
+						<ul class="one-page-menu sf-js-enabled lang-menu">
+							<li><a><img src="/images/flags/gb.png" alt="en" /> en</a>
+								<ul>
+									<li><a href="/de"><img src="/images/flags/at.png" alt="de" /> de</a></li>
+									<li><a href="/en"><img src="/images/flags/gb.png" alt="en" /> en</a></li>
+								</ul>
+							</li>
+						</ul>
+
+					</nav>
+
+				</div>
+
+			</div>
+
+		</header>
+
+		<div class="clear"></div>
+
+
+<section id="content">
+<div class="content-wrap">
+	<div class="container clearfix">
+		<div class="entry clearfix">
+			<a href="/blog">&laquo; back to blog</a>
+			<div class="entry-title">
+				<h1>Translated E-Mails and Account Verification with Phoenix and Swoosh (Auth Part 4)</h1>
+			</div>
+
+			<ul class="entry-meta clearfix">
+				<li><i class="icon-calendar3"></i> 13.03.2018</li>
+			</ul>
+
+			<div class="entry entry-content">
+				<p>We&apos;re really starting to get to know each other, hm? Having gone through writing an auth token library in parts <a href="/blog/2017-12/tokens-cookies-and-sessions-an-auth-story-part-1/">1</a> and <a href="/blog/2018-01/encrypted-auth-tokens-for-phoenix-auth-part-2/">2</a>, and the first steps towards protecting our API with an auth process in part <a href="/blog/2018-01/designing-and-writing-a-basic-authentication-api-with-phoenix-and-elixir-auth-part-3/">3</a>.</p>
+<p>With part 4 now, we&apos;re adding an old but proven technique in the world of technology: emails! This will lead us to choosing an e-mail library, integrating it with Phoenix templates and translating those with gettext.
+Verification e-mails will also allow us to actually test the verification and implement it fully.</p>
+<h2 id="why-even-email-verifications-">Why even email verifications?</h2>
+<p>Email verifications start to seem like something that&apos;s done just because That&apos;s How It&apos;s Always Been, so why not look at the rationale behind it.</p>
+<p>Securing access for an encrypted application is of utmost importance, as losing your password means losing access, and losing access means losing your data - forever and for good.
+If it were trivial to recover your data without it, the encryption wouldn&apos;t be doing anything useful other than playing the role of a fancy door guard.
+There are some recovery methods bound to the email, so ensuring that you entered the correct email address and ensuring that you have access to it is sensible.</p>
+<p>Other use-cases are two-factor authentication over e-mail and password-less login systems where you just get a special short-lived login link per e-mail, like in <a href="https://blog.medium.com/signing-in-to-medium-by-email-aacc21134fcd" rel="external" target="_blank" class="external">Medium</a>.
+So in short, a verification process still makes sense and provides real value.</p>
+<h2 id="collecting-resources">Collecting resources</h2>
+<p>If we want to send out e-mails we can either implement our own library, <a href="https://www.youtube.com/watch?v=4s9IjkMAmns" rel="external" target="_blank" class="external">which why you would ever do that is beyond me</a>, or choose an existing one, of which there are plenty! There&apos;s 3 big ones, that I&apos;ve seen recommended mostly:</p>
+<p><a href="https://github.com/thoughtbot/bamboo" rel="external" target="_blank" class="external">Bamboo</a>, <a href="https://github.com/swoosh/swoosh" rel="external" target="_blank" class="external">Swoosh</a>, and <a href="https://github.com/mailman-elixir/mailman" rel="external" target="_blank" class="external">Mailman</a>.</p>
+<p>They are supposed to execute a very specific task, so naturally they are very similar, with bamboo and swoosh being almost the same.
+They all support sending via SMTP - if you include the corresponding submodule - they all support HTML with Phoenix templates, and they all provide testable mail structures.
+Choosing between similar libraries is always an annoying endeavour, so the criterion I decided to base my choice on was most activity lately: swoosh.</p>
+<p>With that out of the way, our additions to <code class="hljs css"><span class="hljs-selector-tag">mix</span><span class="hljs-selector-class">.exs</span></code> look like this:</p>
+<pre><code class="lang-elixir hljs">{<span class="hljs-symbol">:swoosh</span>, <span class="hljs-string">&quot;~&gt; 0.13&quot;</span>},
+{<span class="hljs-symbol">:phoenix_swoosh</span>, <span class="hljs-string">&quot;~&gt; 0.2&quot;</span>},
+{<span class="hljs-symbol">:gen_smtp</span>, <span class="hljs-string">&quot;~&gt; 0.12&quot;</span>},
+{<span class="hljs-symbol">:gettext</span>, <span class="hljs-string">&quot;~&gt; 0.14&quot;</span>},
+</code></pre>
+<h3 id="gettext">Gettext</h3>
+<p>People have this thing, where they come from different countries and different cultures, and thus don&apos;t all stick to one single language or punctuation system or even date format.
+Even if you think you only need one language <em>now</em>, if you change your mind later, you will curse yourself and the enormous amount of additional work you put upon yourself.
+I speak from experience.</p>
+<p>Just imagine having to go through a few hundred files replacing strings with calls to a translation library, moving all those already translated strings to an external database and no, you don&apos;t have an intern you can push this off to.
+You have to do it.
+It&apos;s no fun.</p>
+<p><a href="https://github.com/elixir-lang/gettext" rel="external" target="_blank" class="external">Gettext</a> is the default way to add localization to your Phoenix app, which is accessible via the <code class="hljs clojure"><span class="hljs-symbol">:gettext</span></code> package, which in turn provides a GNU gettext like API for you to use.</p>
+<h2 id="sending-mail">Sending mail</h2>
+<p>Preparations done, now it&apos;s time for ~action~more preparation.
+The mail package still needs some setting up, otherwise it won&apos;t know how to send mails, from where to send them and which credentials to use.</p>
+<p>In <code class="hljs arduino"><span class="hljs-built_in">config</span>.exs</code> goes the definition for the mail adapter we want to use.
+With our projects we usually use SMTP over our existing external mail infrastructure.</p>
+<pre><code class="lang-elixir hljs">config <span class="hljs-symbol">:sealas_sso</span>, SealasSso.Mailer,
+  <span class="hljs-symbol">adapter:</span> Swoosh.Adapters.SMTP
+</code></pre>
+<p>For production there&apos;s already a <code class="hljs stylus">prod<span class="hljs-selector-class">.secret</span><span class="hljs-selector-class">.exs</span></code> in the config folder, but for this and some other cases it&apos;s useful to have one for the development environment.
+Even then I want to save credentials for services that I might not want to push to a public or even private versioning system.
+So to <code class="hljs css"><span class="hljs-selector-tag">dev</span><span class="hljs-selector-class">.exs</span></code>  I add the line <code class="hljs xl"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;config.secret.exs&quot;</span></code> and then the corresponding file, with the the mail config.</p>
+<pre><code class="lang-elixir hljs">config <span class="hljs-symbol">:sealas_sso</span>, SealasSso.Mailer,
+  <span class="hljs-symbol">relay:</span> <span class="hljs-string">&quot;mail.server.com&quot;</span>,
+  <span class="hljs-symbol">username:</span> <span class="hljs-string">&quot;app@user.name&quot;</span>,
+  <span class="hljs-symbol">password:</span> <span class="hljs-string">&quot;Wicked Secure appPassPhrase&quot;</span>,
+  <span class="hljs-symbol">ssl:</span> <span class="hljs-keyword">true</span>
+</code></pre>
+<p>The test environment will need a separate config, as you probably don&apos;t want to send out e-mails with every test run.
+Swoosh provides a test adapter for use here, so we&apos;re going to put that in our <code class="hljs css"><span class="hljs-selector-tag">test</span><span class="hljs-selector-class">.exs</span></code>:</p>
+<pre><code class="lang-elixir hljs">config <span class="hljs-symbol">:sealas_sso</span>, SealasSso.Mailer,
+  <span class="hljs-symbol">adapter:</span> Swoosh.Adapters.Test
+</code></pre>
+<p>Configuration done, setup not quite yet.
+Mail composition and delivery are two separate components with Swoosh, and each app needs to define their own mail delivery module.
+It&apos;s very short though:</p>
+<pre><code class="lang-elixir hljs"><span class="hljs-class"><span class="hljs-keyword">defmodule</span> <span class="hljs-title">SealasSso</span></span>.Mailer, <span class="hljs-symbol">do:</span> <span class="hljs-keyword">use</span> Swoosh.Mailer, <span class="hljs-symbol">otp_app:</span> <span class="hljs-symbol">:sealas_sso</span>
+</code></pre>
+<h3 id="sending-emails-with-phoenix-templates">Sending emails with Phoenix templates</h3>
+<p>Now we can finally get to sending our sweet, sweet mails.
+Since our project is fully based on Phoenix, we can take advantage of the existing template framework to power the HTML version of our mails.
+With that in mind, we&apos;re going to use <code class="hljs css"><span class="hljs-selector-tag">Phoenix</span><span class="hljs-selector-class">.Swoosh</span></code> and declare the the view modules for the views and layout.</p>
+<pre><code class="lang-elixir hljs"><span class="hljs-class"><span class="hljs-keyword">defmodule</span> <span class="hljs-title">SealasSso</span></span>.MailView, <span class="hljs-symbol">do:</span> <span class="hljs-keyword">use</span> SealasSso, <span class="hljs-symbol">:view</span>
+
+<span class="hljs-class"><span class="hljs-keyword">defmodule</span> <span class="hljs-title">SealasSso</span></span>.LayoutView, <span class="hljs-symbol">do:</span> <span class="hljs-keyword">use</span> SealasSso, <span class="hljs-symbol">:view</span>
+
+<span class="hljs-class"><span class="hljs-keyword">defmodule</span> <span class="hljs-title">SealasSso</span></span>.UserMail <span class="hljs-keyword">do</span>
+  <span class="hljs-keyword">use</span> Phoenix.Swoosh, <span class="hljs-symbol">view:</span> SealasSso.MailView, <span class="hljs-symbol">layout:</span> {SealasSso.LayoutView, <span class="hljs-symbol">:mail</span>}
+  import SealasSso.Gettext
+
+<span class="hljs-keyword">end</span>
+</code></pre>
+<p>Our <code class="hljs css"><span class="hljs-selector-tag">SealasSso</span><span class="hljs-selector-class">.UserMail</span></code> module is now ready to contain our mails.
+Looking at the <a href="https://hexdocs.pm/swoosh/Swoosh.Email.html#content" rel="external" target="_blank" class="external">docs</a>, the general pattern for building them is always the same: create a new mail object and chain together the calls to add features and options.</p>
+<pre><code class="lang-elixir hljs">mail = new()
+|&gt; to(<span class="hljs-string">&quot;user@email.tld&quot;</span>)
+|&gt; from({<span class="hljs-string">&quot;Mailer&quot;</span>, <span class="hljs-string">&quot;mails@from.app&quot;</span>})
+|&gt; subject(<span class="hljs-string">&quot;Hey there&quot;</span>)
+|&gt; render_body(<span class="hljs-symbol">:template_name</span>)
+</code></pre>
+<p>Since we&apos;re going to have different mails sent from this part of our app, with the same set of header parameters but different bodies, we can extract this part and put it in a generalized <code class="hljs arduino"><span class="hljs-built_in">prepare</span>/<span class="hljs-number">1</span></code> function.
+In this case we always want to extract the recipient from a user object, as well as use the same sender, like &quot;Sealas Support <a href="mailto:support@sealas.at">support@sealas.at</a>&quot;.</p>
+<p>In general I would say it is better UX design to provide a &quot;From&quot; email address that is actually in use.
+A &quot;no-reply@&quot; address is just making the process of calling for support more obtuse; especially in case of service mails that are easier to understand if context is provided automatically by the reply function of every mail client.
+It doesn&apos;t matter if the footer provides an explanation like</p>
+<blockquote>
+<p>This is an automatically generated email.
+Please do not reply here.
+If you need help write to other@email.address</p>
+</blockquote>
+<p>Don&apos;t be obtuse, just use the email that is actually in use.
+It rhymes so it must be true.</p>
+<pre><code class="lang-elixir hljs"><span class="hljs-function"><span class="hljs-keyword">defp</span> <span class="hljs-title">prepare</span></span>(user) <span class="hljs-keyword">do</span>
+  mail = new()
+  |&gt; to(user.email)
+  |&gt; from(Application.get_env(<span class="hljs-symbol">:sealas_sso</span>, SealasSso.Mailer)[<span class="hljs-symbol">:from</span>])
+  |&gt; assign(<span class="hljs-symbol">:app_uri</span>,    Application.get_env(<span class="hljs-symbol">:sealas_web</span>, SealasWeb.Endpoint)[<span class="hljs-symbol">:app_uri</span>])
+  |&gt; assign(<span class="hljs-symbol">:static_uri</span>, Application.get_env(<span class="hljs-symbol">:sealas_web</span>, SealasWeb.Endpoint)[<span class="hljs-symbol">:static_uri</span>])
+<span class="hljs-keyword">end</span>
+</code></pre>
+<p>The <code class="hljs autoit"><span class="hljs-built_in">assign</span>/<span class="hljs-number">2</span></code> function allows us to transmit information for use in our email&apos;s content.
+In this case we almost always want to include some links to the app or the website, so we can make those available for use out of the config files - and more importantly, make them easier to change by having them in a config file and not hard-coded directly in the templates.</p>
+<h3 id="account-verification-mail">Account verification mail</h3>
+<p>Let&apos;s look at one example, the mail sent out to verify the email account.
+Using the set up mail from the <code class="hljs arduino"><span class="hljs-built_in">prepare</span>/<span class="hljs-number">1</span></code> function the only things missing are the subject and content.</p>
+<pre><code class="lang-elixir hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">verification</span></span>(user) <span class="hljs-keyword">do</span>
+  prepare(user)
+  |&gt; subject(dgettext <span class="hljs-string">&quot;mail&quot;</span>, <span class="hljs-string">&quot;verification_subject&quot;</span>)
+  |&gt; render_body(<span class="hljs-symbol">:verification</span>, <span class="hljs-symbol">user:</span> user)
+<span class="hljs-keyword">end</span>
+</code></pre>
+<p>Well, that was easy.
+Calling the function from <code class="hljs ebnf"><span class="hljs-attribute">iex -S mix</span></code> shows us a working email generation process (shortened for clarity):</p>
+<pre><code class="lang-elixir hljs">iex|<span class="hljs-number">1</span> &gt; SealasSso.UserMail.verification(%{<span class="hljs-symbol">email:</span> <span class="hljs-string">&quot;user@email.address&quot;</span>, <span class="hljs-symbol">activation_code:</span> <span class="hljs-string">&quot;1234&quot;</span>})
+%Swoosh.Email{
+  <span class="hljs-symbol">assigns:</span> %{
+    <span class="hljs-symbol">app_uri:</span> <span class="hljs-string">&quot;http://app.sealas.local&quot;</span>,
+    <span class="hljs-symbol">layout:</span> {SealasSso.LayoutView, <span class="hljs-string">&quot;mail.text&quot;</span>},
+    <span class="hljs-symbol">static_uri:</span> <span class="hljs-string">&quot;http://static.sealas.local&quot;</span>,
+    <span class="hljs-symbol">user:</span> %{<span class="hljs-symbol">activation_code:</span> <span class="hljs-string">&quot;1234&quot;</span>, <span class="hljs-symbol">email:</span> <span class="hljs-string">&quot;user@email.address&quot;</span>}
+  },
+  <span class="hljs-symbol">from:</span> {<span class="hljs-string">&quot;Sealas&quot;</span>, <span class="hljs-string">&quot;support@sealas.at&quot;</span>},
+  <span class="hljs-symbol">subject:</span> <span class="hljs-string">&quot;Verify your Sealas account&quot;</span>,
+  <span class="hljs-symbol">text_body:</span> <span class="hljs-string">&quot;Just one more step before you can get started.
+  Copy the code below in the verification box:\r\n1234\r\nOr use this to go directly to the verification:\r\nhttp://app.sealas.local/user/verification?u=1234\r\n\r\nAfter the verification you can set a password for your account and start using Sealas.\r\n--\r\n\r\nSealas - Secure Easy And Lovely Accounting Software\r\n\r\nhttps://sealas.at/\r\n&quot;</span>,
+}
+</code></pre>
+<p>The subject line here is just a replacement key to gettext, called here with <code class="hljs ebnf"><span class="hljs-attribute">dgettext</span></code> which translates to &quot;domain restricted gettext&quot;.
+This in turn allows us to specify the domain, or more simply put the translation file, from which we want to get the translation; in this case <code class="hljs ebnf"><span class="hljs-attribute">mail</span></code>  or <code class="hljs css"><span class="hljs-selector-tag">mail</span><span class="hljs-selector-class">.po</span></code>.
+The translations are all located in <code class="hljs accesslog">apps/<span class="hljs-string">[app_name]</span>/priv/gettext/<span class="hljs-string">[locale]</span>/LC_MESSAGES/<span class="hljs-string">[domain]</span>.po</code></p>
+<p>Calling the function and sending an email with it is equally easy.
+You get the built up mail structure, pipe it to your mailer module and call the delivery function <code class="hljs lsl">deliver/<span class="hljs-number">0</span></code>.</p>
+<pre><code class="lang-elixir hljs">SealasSso.UserMail.verification(%{<span class="hljs-symbol">email:</span> user.email, <span class="hljs-symbol">activation_code:</span> code_hash})
+|&gt; SealasSso.Mailer.deliver
+</code></pre>
+<p>At some point though it&apos;s going to be a pain to have to verify all emails by having them sent out and looked at.
+If only there was an easier way...</p>
+<h3 id="testing-mails-">Testing mails!</h3>
+<p>Emails in applications being a thing that I write so automatized, it never occurred to me to have testable emails, so I didn&apos;t even try to do any TDD with it.
+I also don&apos;t want to pretend to have done so here, so I&apos;ll include the tests after having done the implementation.</p>
+<p>Now that we know how to do it though, and see that those tests are actually pretty sensible and usable and <em>really easy</em> to write, we can certainly use this pattern to build the tests for our mails first in the future.</p>
+<p>Step 1: <code class="hljs elm"><span class="hljs-keyword">import</span> Swoosh.TestAssertions</code></p>
+<p>Step 2: ???</p>
+<p>Step 3: <code class="hljs ceylon"><span class="hljs-keyword">assert</span><span class="hljs-number">_</span>email<span class="hljs-number">_</span>sent UserMail.verification(mail<span class="hljs-number">_p</span>arams)</code></p>
+<p>Luckily we can try and recreate the elusive second step in our three step program to profit.
+In the first step we simply import the set of test assertions in the beginning of our module, which grants us access to <code class="hljs ceylon"><span class="hljs-keyword">assert</span><span class="hljs-number">_</span>email<span class="hljs-number">_</span>sent</code>.
+Then comes the part where we append that assertion to our test for trying to register as a new user.
+There we take the returned activation code and used email address to confirm the email that has been sent out with the content we expect.</p>
+<p>In full this looks like this:</p>
+<pre><code class="lang-elixir hljs">test <span class="hljs-string">&quot;register as a new user&quot;</span>, %{<span class="hljs-symbol">conn:</span> conn} <span class="hljs-keyword">do</span>
+  conn = post conn, registration_path(conn, <span class="hljs-symbol">:create</span>), <span class="hljs-symbol">user:</span> <span class="hljs-variable">@registration_attrs</span>
+  assert %{<span class="hljs-string">&quot;activation_code&quot;</span> =&gt; activation_code} = json_response(conn, <span class="hljs-number">201</span>)
+
+  mail_params = %{<span class="hljs-symbol">email:</span> <span class="hljs-variable">@registration_attrs</span>.email, <span class="hljs-symbol">activation_code:</span> activation_code}
+
+  assert_email_sent SealasSso.UserMail.verification(mail_params)
+<span class="hljs-keyword">end</span>
+</code></pre>
+<h3 id="mail-templates">Mail templates</h3>
+<p>Finally let&apos;s look at the templating for mails.
+First the layout files.
+The naming scheme is <code class="hljs css"><span class="hljs-selector-attr">[name]</span>.<span class="hljs-selector-attr">[type]</span><span class="hljs-selector-class">.eex</span></code> which in our case translates to two files <code class="hljs stylus">mail<span class="hljs-selector-class">.html</span><span class="hljs-selector-class">.eex</span></code> and <code class="hljs stylus">mail<span class="hljs-selector-class">.text</span><span class="hljs-selector-class">.eex</span></code> .
+Using both HTML and text layouts makes us send out multi-part emails, so people who don&apos;t like HTML mails can read your mails too.
+The text version of your email is also usually used to generate the preview text in most email clients, which sometimes just contains a friendly but entirely useless message reading</p>
+<blockquote>
+<p>Click here to view our e-mail in all its HTML glory!</p>
+</blockquote>
+<p>Providing a proper text version of your emails is not that hard most of the time, so just do it.
+Back to the layouts; we defined the name of the layout file at the top of <code class="hljs css"><span class="hljs-selector-tag">SealasSso</span><span class="hljs-selector-class">.UserMail</span></code>:</p>
+<pre><code class="lang-elixir hljs"><span class="hljs-keyword">use</span> Phoenix.Swoosh, <span class="hljs-symbol">view:</span> SealasSso.MailView, <span class="hljs-symbol">layout:</span> {SealasSso.LayoutView, <span class="hljs-symbol">:mail</span>}
+</code></pre>
+<p>The content of the layout files is best presented by example using the text version of the layout, simply because it has so little HTML-y clutter.</p>
+<pre><code class="hljs mel">&lt;%= <span class="hljs-keyword">render</span> @view_module, @view_template, assigns %&gt;
+
+--
+This is a service email signature
+Sealas - Secure Easy And Lovely Accounting Software
+
+https:<span class="hljs-comment">//sealas.at/</span>
+</code></pre><p>So, as you can see the only really important thing here is the place where you want to put the final template containing the actual content.
+The templates for the separate mails have the same naming scheme, and are placed in <code class="hljs accesslog">templates/mail/<span class="hljs-string">[name]</span>.<span class="hljs-string">[type]</span>.eex</code>.</p>
+<pre><code class="hljs erb"><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">%=</span></span></span><span class="ruby"> dgettext <span class="hljs-string">&quot;mail&quot;</span>, <span class="hljs-string">&quot;verification_one_more_step&quot;</span> </span><span class="xml"><span class="hljs-tag">%&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">%=</span></span></span><span class="ruby"> @app_uri </span><span class="xml"><span class="hljs-tag">%&gt;</span>/user/verification?u=<span class="hljs-tag">&lt;<span class="hljs-name">%=</span></span></span><span class="ruby"> @user.activation_code </span><span class="xml"><span class="hljs-tag">%&gt;</span>
+</span></code></pre><p>Templates already have gettext available by default, so we can access its functions just as we do outside.
+Calls prefixed with <code class="hljs python"><span class="hljs-meta">@</span></code> are to variables bound to the mail; <code class="hljs">app_uri</code> is passed on by our <code class="hljs arduino"><span class="hljs-built_in">prepare</span>/<span class="hljs-number">1</span></code> function and the <code class="hljs dockerfile"><span class="hljs-keyword">user</span></code> object directly in the call to <code class="hljs">render_body</code>: <code class="hljs dockerfile">|&gt; render_body(:verification, <span class="hljs-keyword">user</span>: <span class="hljs-keyword">user</span>)</code> .</p>
+<p>Finally, here&apos;s the finished mail in all its HTML glory, delivered directly to my inbox - and maybe your&apos;s soon too!</p>
+<p><img src="/images/site/blog/2018-03/verifymail.png" alt="Verification Mail"></p>
+<p>With this we&apos;re done having a basic functional infrastructure for sending out mails.</p>
+<p>Next time we&apos;re going to finish this series on authentication with a discussion and deeper look at account creation and various backend storage strategies when you want to go for an offline first strategy.</p>
+
+			</div>
+
+			<div class="si-share noborder clearfix">
+				<span>Share this Post:</span>
+				<div>
+					<div id="fb-root"></div>
+					<script>(function(d, s, id) {
+					  var js, fjs = d.getElementsByTagName(s)[0];
+					  if (d.getElementById(id)) return;
+					  js = d.createElement(s); js.id = id;
+					  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+					  fjs.parentNode.insertBefore(js, fjs);
+					}(document, 'script', 'facebook-jssdk'));</script>
+
+						<fb:like href='https://sealas.at/blog/2018-03/translated-e-mails-and-account-verification-with-phoenix-and-swoosh-auth-part-4/'
+         send='false'
+         layout='button'
+         show_faces=''
+         width='80'
+         action=''
+         font=''
+         colorscheme=''
+         ref='' ></fb:like>
+
+				 <a href="https://twitter.com/share" class="twitter-share-button" data-text="Translated E-Mails and Account Verification with Phoenix and Swoosh (Auth Part 4)" data-url="https://sealas.at/blog/2018-03/translated-e-mails-and-account-verification-with-phoenix-and-swoosh-auth-part-4/" data-via="SealasApp" data-dnt="true" data-show-count="false">Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+				 <!-- Place this tag where you want the +1 button to render. -->
+				<div class="g-plusone" data-size="medium" data-annotation="none" data-callback="https://sealas.at/blog/2018-03/translated-e-mails-and-account-verification-with-phoenix-and-swoosh-auth-part-4/"></div>
+
+				<!-- Place this tag after the last +1 button tag. -->
+				<script type="text/javascript">
+				  (function() {
+				    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+				    po.src = 'https://apis.google.com/js/platform.js';
+				    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+				  })();
+				</script>
+
+				<script src="//platform.linkedin.com/in.js" type="text/javascript"> lang: en_US</script>
+<script type="IN/Share" data-url="https://sealas.at/blog/2018-03/translated-e-mails-and-account-verification-with-phoenix-and-swoosh-auth-part-4/"></script>
+				</div>
+			</div>
+
+			<div class="post-navigation clearfix">
+				<div class="col_half nobottommargin">
+					
+					<a href="/blog/2018-02/fortifying-apis-timing-attacks/"><i class="icon-arrow-left"></i> Fortifying APIs: timing attacks</a>
+					
+				</div>
+				<div class="col_half col_last tright nobottommargin">
+					
+					<a href="/blog/2018-04/designing-a-user-system-for-an-encrypted-application-auth-part-0/">Designing a user system for an encrypted application (Auth Part 0) <i class="icon-arrow-right"></i></a>
+					
+				</div>
+			</div>
+
+		</div>
+		<div id="section-buy" class="promo promo-border">
+
+	<div class="clearfix">
+
+		<div id="mc_embed_signup" class="widget subscribe-widget clearfix col-md-10 col-md-offset-1">
+			<form action="//sealas.us13.list-manage.com/subscribe/post?u=26cea96bbfb24fbc5f58e314f&amp;id=a92e310c11" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+				<div id="mc_embed_signup_scroll">
+				<h3 style="margin-bottom: 1em;"><span>App development, UX design, business:</span> we're writing about the entire development of Sealas</h3>
+
+				<div class="input-group input-group-lg divcenter">
+					<span class="input-group-addon"><i class="icon-email2"></i></span>
+					<input type="email" value="" required="required" name="EMAIL" class="form-control required email" id="mce-EMAIL" placeholder="Enter your email address here">
+
+					<span class="input-group-btn">
+						<button class="btn btn-success" type="submit">Subscribe</button>
+					</span>
+				</div>
+				<div id="mce-responses" class="clear">
+					<div class="response" id="mce-error-response" style="display:none"></div>
+					<div class="response" id="mce-success-response" style="display:none"></div>
+				</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+					<div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_26cea96bbfb24fbc5f58e314f_a92e310c11" tabindex="-1" value=""></div>
+					<div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+					</div>
+			</form>
+
+			
+		</div>
+	</div>
+
+</div>
+
+	</div>
+
+</div>
+</section>
+
+
+	<footer id="footer" class="dark" style="background: url('/styles/site/images/footer-bg.jpg') repeat fixed; background-size: 100% 100%;">
+
+		<div class="container">
+
+			
+			<div class="footer-widgets-wrap clearfix">
+
+				<div class="col_three_fifth">
+
+					<div class="widget clearfix">
+
+						<img src="/images/sealas-logo-yellow-side.png" alt="Encrypted online accounting for freelancers with Sealas" class="alignleft" id="footer-logo">
+
+						<h3>The <strong>S</strong>ecure <strong>E</strong>asy <strong>A</strong>nd <strong>L</strong>ovely <strong>A</strong>ccounting <strong>S</strong>oftware for freelancers and small businesses.</h3>
+
+						<div class="line" style="margin: 30px 0;"></div>
+						<div class="clearfix" style="padding: 10px 0;">
+							<div class="col_half">
+								<address class="nobottommargin">
+									<abbr title="Headquarters" style="display: inline-block;margin-bottom: 7px;"><strong>Imprint:</strong></abbr><br>
+									Sealas is a service by<br>
+									<a href="https://brainsware.at" target="_blank">Brainsware OG</a><br>
+									Liechtensteinstraße 119/21<br>
+									A-1090 Wien
+								</address>
+							</div>
+							<div class="col_half col_last">
+								<br>ATU68014409<br />
+								HG Wien, FN 330963k<br />
+								<abbr title="Email Address"><strong>Email:</strong></abbr> <a href="mailto:contact@sealas.at">contact@sealas.at</a><br>
+								<abbr title="Web"><strong>Web:</strong></abbr> <a href="https://brainsware.at">https://brainsware.at</a><br>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="col_one_fifth">
+					<div class="bottommargin-sm widget_links">
+						<ul>
+							<li><a href="/">Home</a></li>
+							<li><a href="/en/about">About us</a></li>
+							<li><a href="/#features">Features</a></li>
+							
+							<li><a href="/en/pricing">Pricing</a></li>
+							
+							<li><a href="https://github.com/brainsware/sealas-site">Sealas Website on Github</a></li>
+							<li><a href="https://github.com/brainsware/sealas">Sealas App on Github</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col_one_fifth col_last">
+					<div class="bottommargin-sm widget_links">
+						<ul>
+							<li><a href="/en/blog/"><div>Blog</div></a></li>
+							<li><a href="/en/contact">Contact</a></li>
+							<li><a href="/en/agb">TOS</a></li>
+							<li><a href="/en/privacy">Privacy Policy</a></li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+		
+		<div id="copyrights">
+
+			<div class="container clearfix">
+
+				<div class="col_half">
+					&copy; Brainsware OG
+				</div>
+
+				<div class="col_half col_last tright">
+					<div class="fright clearfix">
+						<a href="https://facebook.com/sealasapp" target="_blank" class="social-icon si-small si-borderless nobottommargin si-facebook">
+							<i class="icon-facebook"></i>
+							<i class="icon-facebook"></i>
+						</a>
+
+						<a href="https://twitter.com/sealasapp" target="_blank" class="social-icon si-small si-borderless nobottommargin si-twitter">
+							<i class="icon-twitter"></i>
+							<i class="icon-twitter"></i>
+						</a>
+
+						
+
+						<a href="https://plus.google.com/+SealasAt" target="_blank" class="social-icon si-small si-borderless nobottommargin si-gplus">
+							<i class="icon-gplus"></i>
+							<i class="icon-gplus"></i>
+						</a>
+
+						<a href="https://www.linkedin.com/company/sealas" target="_blank" class="social-icon si-small si-borderless nobottommargin si-linkedin">
+							<i class="icon-linkedin"></i>
+							<i class="icon-linkedin"></i>
+						</a>
+
+						<a href="https://github.com/brainsware" target="_blank" class="social-icon si-small si-borderless nobottommargin si-github">
+							<i class="icon-github"></i>
+							<i class="icon-github"></i>
+						</a>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+	</footer>
+
+	<script type="text/javascript" src="/site.js">
+	</script>
+
+	<noscript><p><img src="//stats.esotericsystems.at/piwik.php?idsite=13" style="border:0;" alt="" /></p></noscript>
+</body>
+</html>

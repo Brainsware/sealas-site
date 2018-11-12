@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>PGP signed git commits: Encrypt &amp; Verify made easy… possible - Encrypted online accounting for freelancers with Sealas</title>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta content="width=device-width, initial-scale=1" name="viewport"/>
+
+  <meta name="robots" content="index,follow">
+	<meta name="description" content="Zero Knowledge, Open source, Open development. All data stored encrypted, source code open to everyone, blog journey through the whole development.">
+
+	<link rel="alternate" hreflang="de" href="https://sealas.at/" />
+	<link rel="alternate" hreflang="en" href="https://sealas.at/en" />
+
+  <link href="/vendor/open-sans-fontface/open-sans.css" rel="stylesheet" type="text/css"/>
+	<link rel="stylesheet" type="text/css" href="/vendor/lato/css/lato.min.css">
+	<link rel="stylesheet" type="text/css" href="/vendor/fonts-raleway/css/raleway.min.css">
+	<link rel="stylesheet" type="text/css" href="/styles/site/font-icons.css?v=1004">
+	<link rel="stylesheet" type="text/css" href="/styles/font/crete/stylesheet.css?v=1004">
+
+	<link rel="icon" href="/images/sealas-logo-yellow.png" />
+	<link rel="shortcut icon" href="/images/favicon.ico" />
+
+	<link rel="stylesheet" type="text/css" href="/styles/front.css?v=1004">
+	<link rel="stylesheet" type="text/css" href="/styles/site.css?v=1004">
+
+	
+<meta name="twitter:card"       content="summary">
+<meta name="twitter:site"       content="@sealasapp">
+<meta property="og:url"         content="https://sealas.at/blog/2017-10/pgp-signed-git-commits-encrypt-verify-made-easy-possible/">
+<meta property="og:title"       content="PGP signed git commits: Encrypt &amp; Verify made easy… possible">
+<meta property="og:type"        content="article">
+<meta property="og:description" content="Last time we went over creating a &lt;a href=&quot;https://sealas.at/blog/2017-07/creating-a-secure-cloud-infrastructure/&quot;&gt;secured infrastructure and network for our SaaS operation&lt;/a&gt;.">
+<meta property="og:image"       content="https://sealas.at/images/sealas-logo-white-yellow.png">
+
+
+	</head>
+	
+	
+	
+	
+<body>
+	<header id="header">
+
+			<div id="header-wrap">
+
+				<div class="container clearfix">
+
+					<div id="primary-menu-trigger"><i class="icon-reorder"></i></div>
+					<div id="logo">
+						<a href="/" class="standard-logo" data-dark-logo="images/logo-dark.png"><img src="/images/sealas-logo-white-yellow.png" alt="Encrypted online accounting for freelancers with Sealas"></a>
+						<a href="/" class="retina-logo" data-dark-logo="images/logo-dark@2x.png"><img src="/images/sealas-logo-white-yellow.png" alt="Encrypted online accounting for freelancers with Sealas"></a>
+					</div><!-- #logo end -->
+
+					<nav id="primary-menu">
+						<ul class="one-page-menu sf-js-enabled" style="touch-action: pan-y;">
+							
+							<li><a href="/en/about"><div>About us</div></a></li>
+							
+							
+							<li><a href="https://github.com/brainsware/sealas" target="_blank"><div>github</div></a></li>
+							<li><a href="/blog/"><div>Blog</div></a></li>
+						</ul>
+
+						
+
+						<ul class="one-page-menu sf-js-enabled lang-menu">
+							<li><a><img src="/images/flags/gb.png" alt="en" /> en</a>
+								<ul>
+									<li><a href="/de"><img src="/images/flags/at.png" alt="de" /> de</a></li>
+									<li><a href="/en"><img src="/images/flags/gb.png" alt="en" /> en</a></li>
+								</ul>
+							</li>
+						</ul>
+
+					</nav>
+
+				</div>
+
+			</div>
+
+		</header>
+
+		<div class="clear"></div>
+
+
+<section id="content">
+<div class="content-wrap">
+	<div class="container clearfix">
+		<div class="entry clearfix">
+			<a href="/blog">&laquo; back to blog</a>
+			<div class="entry-title">
+				<h1>PGP signed git commits: Encrypt &amp; Verify made easy… possible</h1>
+			</div>
+
+			<ul class="entry-meta clearfix">
+				<li><i class="icon-calendar3"></i> 20.10.2017</li>
+			</ul>
+
+			<div class="entry entry-content">
+				<p>Last time we went over creating a <a href="https://sealas.at/blog/2017-07/creating-a-secure-cloud-infrastructure/">secured infrastructure and network for our SaaS operation</a>.</p>
+<p>When we set out to <a href="https://sealas.at/blog/2017-07/relaunching-sealas-or-how-i-learned-to-stop-worrying-and-kill-our-product/">reboot Sealas</a> we decided to refine our development process.
+We were offering end-to-end encryption for our users, but the the only way we could guarantee that, in our eyes, was by making the development process end-to-end <em>verified</em>.</p>
+<h2 id="why-we-re-signing-our-commits">Why we&apos;re signing our commits</h2>
+<p>In Git the author of a commit is determined simply by a setting in your local Git client.
+This can be changed at any time, to anything you want, like so:</p>
+<pre><code class="lang-sh hljs bash">git config --global user.email <span class="hljs-string">&quot;therealgeorgy_w@gov.us&quot;</span>
+git config --global user.name  <span class="hljs-string">&quot;Really George Washington&quot;</span>
+</code></pre>
+<p>This makes an identity provided by Git pretty insecure and unreliable.
+So let&apos;s imagine someone pretends to be me and copies my writing style and posts a pull request for a &quot;fix&quot; as me.
+A co-worker could just think, &quot;Eh, small fix, tests don&apos;t break, merged.&quot;, having thus introduced a possible vulnerability.</p>
+<p>This is less of a problem when using a platform like GitHub, which doesn&apos;t care about your Git author settings, but only displays the account you work from on GitHub.
+Issues could arise for people not using GitHub or when you move away the repository to another host.
+The other issue is as always unforeseen security vulnerabilities in the platform itself.</p>
+<p>To further ensure that we can trust that each maintainer is actually who we think they are, we can introduce PGP signed commits.
+However since the process of generating a key, and then having that key signed is long and complicated, it wouldn&apos;t make sense to require this for all people trying to contribute to the project.
+The user experience behind this could also just lead to people generating a key once for this commit and then throwing it away, just to get a then meaningless signed commit.</p>
+<p>So we set up a policy that is a decent compromise between security and usability:</p>
+<ul>
+<li>pull requests from third party contributers can come from anyone and don&apos;t need to be signed.</li>
+<li>merges and commits to master need to be signed, and should be checked thoroughly</li>
+</ul>
+<h2 id="introducing-hardware-keys">Introducing hardware keys</h2>
+<p>Our generated PGP keys need protection as well.
+Even though our general development environments setup include encrypted disks, we decided to go one step further and put our keys on a physical key:</p>
+<p>Yubikeys were already an integral part of our two factor authentication process, which made them a natural fit to use as external storage devices.
+The advantage of using them comes twofold:</p>
+<ul>
+<li>They have <a href="https://www.yubico.com/support/knowledge-base/categories/articles/use-yubikey-openpgp/" rel="external" target="_blank" class="external">built-in support for PGP keys</a></li>
+<li>They&apos;re small and portable, so you can have your PGP key with you on your travels hanging on your keychain (or if you&apos;re like Igor, around your neck)</li>
+</ul>
+<p>Yubico, the company behind Yubikeys, has come a long way from <a href="https://www.yubico.com/2016/05/secure-hardware-vs-open-source/" rel="external" target="_blank" class="external">bashing open source processes</a> to <a href="https://www.yubico.com/keycheck/" rel="external" target="_blank" class="external">responsibly disclosing and mitigating vulnerabilities and breaches</a>.
+Let&apos;s hope they stay that way, so we can continue to trust them, or at least their devices to securely store our keys.</p>
+<h2 id="creating-and-signing-pgp-keys">Creating and signing PGP keys</h2>
+<p>We followed the basic outline described in the official <a href="https://www.yubico.com/2012/12/yubikey-neo-openpgp/" rel="external" target="_blank" class="external">YubiKey NEO and OpenPGP</a> how-to.
+Where we deviated, by dumb luck, we made our setup more secure:
+For instance, Daniel created his key on his laptop, rather than on the Yubikey itself.
+Which was good because <a href="https://www.yubico.com/keycheck/" rel="external" target="_blank" class="external">now</a> he doesn&apos;t have to regenerate it.
+(Igor&apos;s key is the Yubikey NEO, which wasn&apos;t affected)</p>
+<h3 id="summary-of-the-how-to">Summary of the How-to</h3>
+<ol>
+<li>Set the key into a multi-mode using a Yubikey manager</li>
+<li>Create a PGP (on the key)</li>
+<li>Export &amp; publish the public key</li>
+<li>Verify and Sign each other&apos;s keys</li>
+</ol>
+<p>This outline is really simple, and the descriptions are easy to follow, so it&apos;s no surprise that it took us no longer than 10 hours to get through with this.</p>
+<p>Rather than retracing the How-to, I&apos;d simply like to point out some</p>
+<h3 id="caveats">Caveats</h3>
+<p>A first false start was that GitLab and GitHub rely on the email for verification.
+So if you&apos;re going to create a key without (like <a href="https://daenney.github.io/2016/01/09/PGP-one-last-try.html" rel="external" target="_blank" class="external">daenney</a>), you should at least create a sub-key that has an email address attached.</p>
+<p>A couple of years ago, <a href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=363516" rel="external" target="_blank" class="external">Debian&apos;s OpenSSL advisory</a> meant that creating RSA keys on a Debian machine was a very bad idea.
+Now, with this <a href="https://www.yubico.com/support/security-advisories/ysa-2017-01/" rel="external" target="_blank" class="external">Infineon issue</a> it means that creating RSA keys on devices whose firmware uses Infineon&apos;s <em>fast</em> API calls will leave you vulnerable.
+So there&apos;s no clear guideline here, other than keeping up-to-date and agile when it comes to <em>rotating</em> keys!</p>
+<p>Next, a word on <a href="https://developers.yubico.com/libu2f-host/Mode_switch_YubiKey.html" rel="external" target="_blank" class="external"><em>modes</em></a>.
+As mentioned above, we use our Yubikeys for 2FA and storing PGP keys.
+However, the Yubikey (NEO at least) can only be in one mode at a time.
+That means, when switching between using the Yubikey as 2FA device and using it as PGP key, you will have to unplug the device, or kill GPG&apos;s <code class="hljs ebnf"><span class="hljs-attribute">scdaemon</span></code> to &quot;refresh&quot; the mode.
+I can also highly recommend verifying the enabled modes with a GUI program, since the hex numbers can be a bit confusing.</p>
+<p>Finally, there&apos;s the issue of simply forgetting to plug the Yubikey key while writing a long-winded Git commit message.
+The result will be an error message like:</p>
+<pre><code class="lang-sh hljs bash">error: gpg failed to sign the data
+fatal: failed to write commit object
+</code></pre>
+<p>Now, if we plug back in, we can restore the Git commit message by using the file where Git auto-saves commit messages itself!</p>
+<pre><code class="lang-sh hljs bash">git commit -eF .git/COMMIT_EDITMSG
+</code></pre>
+<p>Note that <code class="hljs diff"><span class="hljs-deletion">-e</span></code> opens your favourite editor here.
+This is especially useful if you want to cross-verify what you wrote, or make sure you&apos;re not adding commit-message onto commit-message onto commit message here!</p>
+<h2 id="where-next-">Where next?</h2>
+<p>That&apos;s all folks.
+With this in place we can start pushing commits, and Github will now show your commits like so:</p>
+<p><img src="/images/site/blog/2017-10/verified-commits.png" alt="Github Verified Commits"></p>
+<p>The last issue we need to solve is that little hole there.
+In this specific case, it&apos;s a merge-request &#x2014; done by the GitHub Web UI itself, so <em>fortunately</em> that didn&apos;t have access to my PGP key.
+However, in the future, we&apos;d like to ensure that</p>
+<ul>
+<li>all commits by core-contributors are signed</li>
+<li>Especially when they are merging pull requests from outside contributors</li>
+</ul>
+<p>Until then, stay tuned!</p>
+
+			</div>
+
+			<div class="si-share noborder clearfix">
+				<span>Share this Post:</span>
+				<div>
+					<div id="fb-root"></div>
+					<script>(function(d, s, id) {
+					  var js, fjs = d.getElementsByTagName(s)[0];
+					  if (d.getElementById(id)) return;
+					  js = d.createElement(s); js.id = id;
+					  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+					  fjs.parentNode.insertBefore(js, fjs);
+					}(document, 'script', 'facebook-jssdk'));</script>
+
+						<fb:like href='https://sealas.at/blog/2017-10/pgp-signed-git-commits-encrypt-verify-made-easy-possible/'
+         send='false'
+         layout='button'
+         show_faces=''
+         width='80'
+         action=''
+         font=''
+         colorscheme=''
+         ref='' ></fb:like>
+
+				 <a href="https://twitter.com/share" class="twitter-share-button" data-text="PGP signed git commits: Encrypt &amp; Verify made easy… possible" data-url="https://sealas.at/blog/2017-10/pgp-signed-git-commits-encrypt-verify-made-easy-possible/" data-via="SealasApp" data-dnt="true" data-show-count="false">Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+				 <!-- Place this tag where you want the +1 button to render. -->
+				<div class="g-plusone" data-size="medium" data-annotation="none" data-callback="https://sealas.at/blog/2017-10/pgp-signed-git-commits-encrypt-verify-made-easy-possible/"></div>
+
+				<!-- Place this tag after the last +1 button tag. -->
+				<script type="text/javascript">
+				  (function() {
+				    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+				    po.src = 'https://apis.google.com/js/platform.js';
+				    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+				  })();
+				</script>
+
+				<script src="//platform.linkedin.com/in.js" type="text/javascript"> lang: en_US</script>
+<script type="IN/Share" data-url="https://sealas.at/blog/2017-10/pgp-signed-git-commits-encrypt-verify-made-easy-possible/"></script>
+				</div>
+			</div>
+
+			<div class="post-navigation clearfix">
+				<div class="col_half nobottommargin">
+					
+					<a href="/blog/2017-09/multi-tenant-vs-multi-instance/"><i class="icon-arrow-left"></i> Multi tenant vs multi instance</a>
+					
+				</div>
+				<div class="col_half col_last tright nobottommargin">
+					
+					<a href="/blog/2017-11/custom-ecto-types/">Custom ecto types <i class="icon-arrow-right"></i></a>
+					
+				</div>
+			</div>
+
+		</div>
+		<div id="section-buy" class="promo promo-border">
+
+	<div class="clearfix">
+
+		<div id="mc_embed_signup" class="widget subscribe-widget clearfix col-md-10 col-md-offset-1">
+			<form action="//sealas.us13.list-manage.com/subscribe/post?u=26cea96bbfb24fbc5f58e314f&amp;id=a92e310c11" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+				<div id="mc_embed_signup_scroll">
+				<h3 style="margin-bottom: 1em;"><span>App development, UX design, business:</span> we're writing about the entire development of Sealas</h3>
+
+				<div class="input-group input-group-lg divcenter">
+					<span class="input-group-addon"><i class="icon-email2"></i></span>
+					<input type="email" value="" required="required" name="EMAIL" class="form-control required email" id="mce-EMAIL" placeholder="Enter your email address here">
+
+					<span class="input-group-btn">
+						<button class="btn btn-success" type="submit">Subscribe</button>
+					</span>
+				</div>
+				<div id="mce-responses" class="clear">
+					<div class="response" id="mce-error-response" style="display:none"></div>
+					<div class="response" id="mce-success-response" style="display:none"></div>
+				</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+					<div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_26cea96bbfb24fbc5f58e314f_a92e310c11" tabindex="-1" value=""></div>
+					<div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+					</div>
+			</form>
+
+			
+		</div>
+	</div>
+
+</div>
+
+	</div>
+
+</div>
+</section>
+
+
+	<footer id="footer" class="dark" style="background: url('/styles/site/images/footer-bg.jpg') repeat fixed; background-size: 100% 100%;">
+
+		<div class="container">
+
+			
+			<div class="footer-widgets-wrap clearfix">
+
+				<div class="col_three_fifth">
+
+					<div class="widget clearfix">
+
+						<img src="/images/sealas-logo-yellow-side.png" alt="Encrypted online accounting for freelancers with Sealas" class="alignleft" id="footer-logo">
+
+						<h3>The <strong>S</strong>ecure <strong>E</strong>asy <strong>A</strong>nd <strong>L</strong>ovely <strong>A</strong>ccounting <strong>S</strong>oftware for freelancers and small businesses.</h3>
+
+						<div class="line" style="margin: 30px 0;"></div>
+						<div class="clearfix" style="padding: 10px 0;">
+							<div class="col_half">
+								<address class="nobottommargin">
+									<abbr title="Headquarters" style="display: inline-block;margin-bottom: 7px;"><strong>Imprint:</strong></abbr><br>
+									Sealas is a service by<br>
+									<a href="https://brainsware.at" target="_blank">Brainsware OG</a><br>
+									Liechtensteinstraße 119/21<br>
+									A-1090 Wien
+								</address>
+							</div>
+							<div class="col_half col_last">
+								<br>ATU68014409<br />
+								HG Wien, FN 330963k<br />
+								<abbr title="Email Address"><strong>Email:</strong></abbr> <a href="mailto:contact@sealas.at">contact@sealas.at</a><br>
+								<abbr title="Web"><strong>Web:</strong></abbr> <a href="https://brainsware.at">https://brainsware.at</a><br>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="col_one_fifth">
+					<div class="bottommargin-sm widget_links">
+						<ul>
+							<li><a href="/">Home</a></li>
+							<li><a href="/en/about">About us</a></li>
+							<li><a href="/#features">Features</a></li>
+							
+							<li><a href="/en/pricing">Pricing</a></li>
+							
+							<li><a href="https://github.com/brainsware/sealas-site">Sealas Website on Github</a></li>
+							<li><a href="https://github.com/brainsware/sealas">Sealas App on Github</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col_one_fifth col_last">
+					<div class="bottommargin-sm widget_links">
+						<ul>
+							<li><a href="/en/blog/"><div>Blog</div></a></li>
+							<li><a href="/en/contact">Contact</a></li>
+							<li><a href="/en/agb">TOS</a></li>
+							<li><a href="/en/privacy">Privacy Policy</a></li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+		
+		<div id="copyrights">
+
+			<div class="container clearfix">
+
+				<div class="col_half">
+					&copy; Brainsware OG
+				</div>
+
+				<div class="col_half col_last tright">
+					<div class="fright clearfix">
+						<a href="https://facebook.com/sealasapp" target="_blank" class="social-icon si-small si-borderless nobottommargin si-facebook">
+							<i class="icon-facebook"></i>
+							<i class="icon-facebook"></i>
+						</a>
+
+						<a href="https://twitter.com/sealasapp" target="_blank" class="social-icon si-small si-borderless nobottommargin si-twitter">
+							<i class="icon-twitter"></i>
+							<i class="icon-twitter"></i>
+						</a>
+
+						
+
+						<a href="https://plus.google.com/+SealasAt" target="_blank" class="social-icon si-small si-borderless nobottommargin si-gplus">
+							<i class="icon-gplus"></i>
+							<i class="icon-gplus"></i>
+						</a>
+
+						<a href="https://www.linkedin.com/company/sealas" target="_blank" class="social-icon si-small si-borderless nobottommargin si-linkedin">
+							<i class="icon-linkedin"></i>
+							<i class="icon-linkedin"></i>
+						</a>
+
+						<a href="https://github.com/brainsware" target="_blank" class="social-icon si-small si-borderless nobottommargin si-github">
+							<i class="icon-github"></i>
+							<i class="icon-github"></i>
+						</a>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+	</footer>
+
+	<script type="text/javascript" src="/site.js">
+	</script>
+
+	<noscript><p><img src="//stats.esotericsystems.at/piwik.php?idsite=13" style="border:0;" alt="" /></p></noscript>
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Designing a user system for an encrypted application (Auth Part 0) - Encrypted online accounting for freelancers with Sealas</title>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta content="width=device-width, initial-scale=1" name="viewport"/>
+
+  <meta name="robots" content="index,follow">
+	<meta name="description" content="Zero Knowledge, Open source, Open development. All data stored encrypted, source code open to everyone, blog journey through the whole development.">
+
+	<link rel="alternate" hreflang="de" href="https://sealas.at/" />
+	<link rel="alternate" hreflang="en" href="https://sealas.at/en" />
+
+  <link href="/vendor/open-sans-fontface/open-sans.css" rel="stylesheet" type="text/css"/>
+	<link rel="stylesheet" type="text/css" href="/vendor/lato/css/lato.min.css">
+	<link rel="stylesheet" type="text/css" href="/vendor/fonts-raleway/css/raleway.min.css">
+	<link rel="stylesheet" type="text/css" href="/styles/site/font-icons.css?v=1004">
+	<link rel="stylesheet" type="text/css" href="/styles/font/crete/stylesheet.css?v=1004">
+
+	<link rel="icon" href="/images/sealas-logo-yellow.png" />
+	<link rel="shortcut icon" href="/images/favicon.ico" />
+
+	<link rel="stylesheet" type="text/css" href="/styles/front.css?v=1004">
+	<link rel="stylesheet" type="text/css" href="/styles/site.css?v=1004">
+
+	
+<meta name="twitter:card"       content="summary">
+<meta name="twitter:site"       content="@sealasapp">
+<meta property="og:url"         content="https://sealas.at/blog/2018-04/designing-a-user-system-for-an-encrypted-application-auth-part-0/">
+<meta property="og:title"       content="Designing a user system for an encrypted application (Auth Part 0)">
+<meta property="og:type"        content="article">
+<meta property="og:description" content="When writing a user system for a client-side encrypted application, you first have to start with the universe. Well, that might be too much, so let&#39;s start a bit further ahead.">
+<meta property="og:image"       content="https://sealas.at/images/sealas-logo-white-yellow.png">
+
+
+	</head>
+	
+	
+	
+	
+<body>
+	<header id="header">
+
+			<div id="header-wrap">
+
+				<div class="container clearfix">
+
+					<div id="primary-menu-trigger"><i class="icon-reorder"></i></div>
+					<div id="logo">
+						<a href="/" class="standard-logo" data-dark-logo="images/logo-dark.png"><img src="/images/sealas-logo-white-yellow.png" alt="Encrypted online accounting for freelancers with Sealas"></a>
+						<a href="/" class="retina-logo" data-dark-logo="images/logo-dark@2x.png"><img src="/images/sealas-logo-white-yellow.png" alt="Encrypted online accounting for freelancers with Sealas"></a>
+					</div><!-- #logo end -->
+
+					<nav id="primary-menu">
+						<ul class="one-page-menu sf-js-enabled" style="touch-action: pan-y;">
+							
+							<li><a href="/en/about"><div>About us</div></a></li>
+							
+							
+							<li><a href="https://github.com/brainsware/sealas" target="_blank"><div>github</div></a></li>
+							<li><a href="/blog/"><div>Blog</div></a></li>
+						</ul>
+
+						
+
+						<ul class="one-page-menu sf-js-enabled lang-menu">
+							<li><a><img src="/images/flags/gb.png" alt="en" /> en</a>
+								<ul>
+									<li><a href="/de"><img src="/images/flags/at.png" alt="de" /> de</a></li>
+									<li><a href="/en"><img src="/images/flags/gb.png" alt="en" /> en</a></li>
+								</ul>
+							</li>
+						</ul>
+
+					</nav>
+
+				</div>
+
+			</div>
+
+		</header>
+
+		<div class="clear"></div>
+
+
+<section id="content">
+<div class="content-wrap">
+	<div class="container clearfix">
+		<div class="entry clearfix">
+			<a href="/blog">&laquo; back to blog</a>
+			<div class="entry-title">
+				<h1>Designing a user system for an encrypted application (Auth Part 0)</h1>
+			</div>
+
+			<ul class="entry-meta clearfix">
+				<li><i class="icon-calendar3"></i> 06.04.2018</li>
+			</ul>
+
+			<div class="entry entry-content">
+				<p>When writing a user system for a client-side encrypted application, you first have to start with the universe. Well, that might be too much, so let&apos;s start a bit further ahead.</p>
+<p>The user system is usually the first big stumbling block when venturing into the development of a client-side encrypted application. Let&apos;s look at a regular application first:</p>
+<h2 id="what-s-in-a-user-system-">What&apos;s in a user system?</h2>
+<p>There&apos;s two main concerns covered in any user system:</p>
+<ul>
+<li>Authentication, checking the authenticity of a user&apos;s provided credentials and</li>
+<li>Authorization, checking if the user has sufficient rights to perform the requested action</li>
+</ul>
+<p>Authorization, while usually messy and complicated in its own right, doesn&apos;t really differ for client-side encrypted applications; so we&apos;re going to focus on authentication.</p>
+<p>The two basic, core elements of any authentication request is an <strong>identifier</strong> and an <strong>authentication token/proof of identity</strong>. Successfully combining those two elements let&apos;s you know <strong>who</strong> it is that wants to use your application, and that they really are who they claim to be. Or at least someone who knows how to identify as such.</p>
+<p>Traditionally the token was only provided in the form of a password. With time the variations grew in number, adding new layers of security and complexity, some with the goal of reducing the complexity on the user&apos;s end.</p>
+<ul>
+<li>Third party services, that simply provide you with an opaque token so the user can reuse their account over and over again</li>
+<li>Password-less style of login, where the token is the link sent to the user&apos;s email account</li>
+<li>Two-factor authentication splits the concept further, by requiring a combination of knowledge and physical entity, like a password and a physical key like a Yubikey</li>
+</ul>
+<p>Then there are other elements that are all essential when it comes to any authentication system that users intuitively expect to be there:</p>
+<ul>
+<li>Access recovery, in case you lost the post-it with your password on it. Usually you simply get sent a password reset link or token sent to your provided e-mail address. Simple and sufficient.</li>
+<li>Access token change, in case you are forced by the provider or administrator to change your password, for example because of a <a href="https://arstechnica.com/information-technology/2016/08/frequent-password-changes-are-the-enemy-of-security-ftc-technologist-says/" rel="external" target="_blank" class="external">password expiration policy</a> or a breach. Because nobody ever does it voluntarily.</li>
+</ul>
+<p>These are all things we can make use of to design a regular user system. However, since we&apos;re not developing a regular application, but one to make our lives as developers more difficult, there&apos;s special considerations we have to take into account.</p>
+<h3 id="so-what-s-in-a-client-side-encrypted-application-s-user-system-">So, what&apos;s in a client-side encrypted application&apos;s user system?</h3>
+<p>Well, let&apos;s back off a bit again, and start with a more elementary question:</p>
+<p><em>What are the important things to consider when developing an application for which you store data that is entirely opaque?</em></p>
+<p>There is no method for reading, no method for manipulating (other than destroying), no method for aggregating and analyzing data. This is the basis on which any application operates that encrypts all user data on the client before it is sent anywhere for storage. Following our <a href="https://sealas.at/blog/2017-07/sealas-threat-model/">threat model</a>, this is what we have to ensure to fulfil our own requirements.</p>
+<p>Yet we still want to provide our users with a comfortable user experience. One of the most important factors in any web application is reliability. Nobody wants to use something that could break at any moment or is so fragile that one mistake from the user&apos;s side renders the whole experience unusable.</p>
+<p>So how do we go about designing a user system that ensures resilience, usability and reliability with client-side encryption? We will look at the handling of the encryption key, how that ties in with account sharing, and various recoverability options in case of another password lost forever in the black hole behind a couch.</p>
+<h3 id="architecture-design-requirements">Architecture/Design requirements</h3>
+<p>How does this thing even look like? What are the moving parts in this system?</p>
+<p>First, to ensure that this is actually a client-side encrypted application, the client needs to be the only party ever having access to cleartext data. The server is more of a reduced dumb storage service. Moreover, the server is at no point not to be <em>trusted</em> with our cleartext data. Consider it a dubious henchman.</p>
+<p>So all key generation needs to happen on the client, otherwise all our work would be useless. This leads us to our first additional data point for our user system:</p>
+<h2 id="the-application-key">The application key</h2>
+<p>This piece of data is essential for the user, but how it is generated and which technique is more or less useful for which use-case, is a subject for a later article. We&apos;re going to look at two approaches of dealing with <em>storing</em> the key:</p>
+<p>For the simplest variant we could forego storage altogether, by simply generating a key based on the user&apos;s password.</p>
+<h3 id="the-easy-way">The easy way</h3>
+<p>This is what I would consider a bad idea.</p>
+<p>Looking at the lovely <a href="https://standardnotes.org" rel="external" target="_blank" class="external">Standard Notes app</a>, an encrypted note taking app, this note on the registration page made me pause:</p>
+<p><img src="https://cdn.sealas.at/blog/sn.png" alt="Standard Notes registration screen"></p>
+<p>No password reset for any kind of account system is a problem, but it&apos;s an even bigger problem when you have an application focused on security. Especially considering that passwords chosen by people are usually either <a href="https://www.csoonline.com/article/3244004/security/top-25-worst-most-insecure-passwords-used-in-2017.html" rel="external" target="_blank" class="external">not good</a>, or <a href="https://www.schneier.com/blog/archives/2017/10/changes_in_pass.html" rel="external" target="_blank" class="external">easily forgotten</a>.</p>
+<p>This can be alleviated by some good UI/UX design on the registration page. For example you could provide automatically generated passwords for safekeeping in password managers. Helpful tips on how to choose a secure password is another one.</p>
+<p>None of these however will make up for the fact, that your key and password are always interlocked. The result would either be an application without any password changing option, or one which would require re-encrypting all data once the password is changed.</p>
+<h3 id="the-hard-way-decoupling-login-and-account-information">The hard way: decoupling login and account information</h3>
+<p>It&apos;s not really hard, just a bit more roundabout. Since generating the key every time based on the user&apos;s password is bad, we have to find some other way to handle the key. The approach I suggest is generating a random (as random as possible) key, and encrypt that using the user&apos;s password.</p>
+<p>This way you have a clear separation of key and package, the encrypted container holding the key. The user can easily change the password, as now this operation means extracting the key with the old password, and repackaging it with the new one.</p>
+<p>Another possibility open to us now is account sharing. Since the key is a separate entity, we can package our key up with a temporary password for someone else, who can then take the key and repackage that. Now both have access to the account with a shared key. Otherwise the only way to share an account would be sharing your password, which is always a big security risk. More important for the user however is the user experience element: as soon as you don&apos;t want to share your account anymore, you have to change your password. With separated access, you can simply revoke it.</p>
+<h2 id="recoverability">Recoverability</h2>
+<p>A lost account makes a sad user, and if with the account they also lost all their data, you will have a user that will probably hate you forever. This is especially true now that we have an encryption key that is encrypted using the user&apos;s password: that means we, or you, as the provider, can&apos;t just change the user&apos;s password and all is well. The encryption key requires the correct password.</p>
+<p>Looking at it from a more positive side, having a packed up key opens up the way to more recoverability options we can implement to postpone a user&apos;s account&apos;s demise.</p>
+<h3 id="password-backups">Password backups</h3>
+<p>Since we store the password protected app key, one option is to save the previous packed key on a password change. Assuming there&apos;s been a new password leak and people actually follow their new year&apos;s resolution to change their passwords, chances are they&apos;re going to forget that new password. Having a &quot;revert to previous password&quot; option would be quite helpful here.</p>
+<p>As the narrative already reveals though, user comfort is at odds with security. There are further steps we can make to alleviate some of the security downsides, like only providing access to this functionality through an e-mail link. For a more advanced version, you might track and check the user&apos;s behaviour or location to see if it is actually the user and not someone else trying to &quot;recover&quot; the account.</p>
+<p>In case the user has a password manager, this is less relevant, so an option for the user to disable it might make sense.</p>
+<h3 id="recovery-tokens-on-trusted-computers">Recovery tokens on trusted computers</h3>
+<p>Another possibility opened up by a separated key and packaging is an extended version of &quot;trust this computer&quot;. When logging in on a trusted computer, the client can generate a one-time use password for local storage on the computer with which the key gets packaged again. This is similar to a key sharing scenario, only that you are sharing the key with yourself and with a password that you don&apos;t know, and that is only usable once.</p>
+<p>Again some security concerns about misuse arise; so additional barriers to access are really useful, like a link sent to the registered e-mail address.</p>
+<h3 id="restrictions">Restrictions</h3>
+<p>These examples also highlight the importance of one element, and a restriction on working with client-side encryption: <a href="https://sealas.at/blog/2018-03/translated-e-mails-and-account-verification-with-phoenix-and-swoosh-auth-part-4/">e-mail</a> is an integral piece of communication and layer of security.</p>
+<p>Third party authentication services are not something you can use here. The user will always have to provide you, or at least the client, with a password, thus rendering the advantages of a third party authentication void.</p>
+<h3 id="password-less-login">Password-less login</h3>
+<p>Let&apos;s not fret, there&apos;s one more thing we can add, courtesy of our previously described recovery tokens: a password-less login. Any time a user wants to login on a system that is already identified to be &quot;trusted&quot;, a separate password-less login can be added.</p>
+<p>This would just send out an e-mail with a login link, that would use up the packaged key with the locally stored one-time password, use it for a login and then regenerate it.</p>
+<h2 id="recap">Recap</h2>
+<p>In contrast to a user system for a regular application, including client-side encryption of all data puts up some restrictions and additional data points that need to be considered. The most important one is the addition of an encryption key. Handling it can be done two ways: either generated every time on the fly using the password, or stored in an encrypted container using the password.</p>
+<p>Generating it on the fly is quick and simple but also very restrictive, as it doesn&apos;t allow you to ever change your password.</p>
+<p>Having a separate package for the key requires some additional code and interaction flows, but allows you to change the password any time you want. Coming with that are a myriad of recovery and UX options that become available.</p>
+
+			</div>
+
+			<div class="si-share noborder clearfix">
+				<span>Share this Post:</span>
+				<div>
+					<div id="fb-root"></div>
+					<script>(function(d, s, id) {
+					  var js, fjs = d.getElementsByTagName(s)[0];
+					  if (d.getElementById(id)) return;
+					  js = d.createElement(s); js.id = id;
+					  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+					  fjs.parentNode.insertBefore(js, fjs);
+					}(document, 'script', 'facebook-jssdk'));</script>
+
+						<fb:like href='https://sealas.at/blog/2018-04/designing-a-user-system-for-an-encrypted-application-auth-part-0/'
+         send='false'
+         layout='button'
+         show_faces=''
+         width='80'
+         action=''
+         font=''
+         colorscheme=''
+         ref='' ></fb:like>
+
+				 <a href="https://twitter.com/share" class="twitter-share-button" data-text="Designing a user system for an encrypted application (Auth Part 0)" data-url="https://sealas.at/blog/2018-04/designing-a-user-system-for-an-encrypted-application-auth-part-0/" data-via="SealasApp" data-dnt="true" data-show-count="false">Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+				 <!-- Place this tag where you want the +1 button to render. -->
+				<div class="g-plusone" data-size="medium" data-annotation="none" data-callback="https://sealas.at/blog/2018-04/designing-a-user-system-for-an-encrypted-application-auth-part-0/"></div>
+
+				<!-- Place this tag after the last +1 button tag. -->
+				<script type="text/javascript">
+				  (function() {
+				    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+				    po.src = 'https://apis.google.com/js/platform.js';
+				    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+				  })();
+				</script>
+
+				<script src="//platform.linkedin.com/in.js" type="text/javascript"> lang: en_US</script>
+<script type="IN/Share" data-url="https://sealas.at/blog/2018-04/designing-a-user-system-for-an-encrypted-application-auth-part-0/"></script>
+				</div>
+			</div>
+
+			<div class="post-navigation clearfix">
+				<div class="col_half nobottommargin">
+					
+					<a href="/blog/2018-03/translated-e-mails-and-account-verification-with-phoenix-and-swoosh-auth-part-4/"><i class="icon-arrow-left"></i> Translated E-Mails and Account Verification with Phoenix and Swoosh (Auth Part 4)</a>
+					
+				</div>
+				<div class="col_half col_last tright nobottommargin">
+					
+					<a href="/blog/2018-05/offline-first-client-side-encryption-and-the-quest-for-a-proper-datastore/">Offline first, client-side encryption and the quest for a proper datastore <i class="icon-arrow-right"></i></a>
+					
+				</div>
+			</div>
+
+		</div>
+		<div id="section-buy" class="promo promo-border">
+
+	<div class="clearfix">
+
+		<div id="mc_embed_signup" class="widget subscribe-widget clearfix col-md-10 col-md-offset-1">
+			<form action="//sealas.us13.list-manage.com/subscribe/post?u=26cea96bbfb24fbc5f58e314f&amp;id=a92e310c11" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+				<div id="mc_embed_signup_scroll">
+				<h3 style="margin-bottom: 1em;"><span>App development, UX design, business:</span> we're writing about the entire development of Sealas</h3>
+
+				<div class="input-group input-group-lg divcenter">
+					<span class="input-group-addon"><i class="icon-email2"></i></span>
+					<input type="email" value="" required="required" name="EMAIL" class="form-control required email" id="mce-EMAIL" placeholder="Enter your email address here">
+
+					<span class="input-group-btn">
+						<button class="btn btn-success" type="submit">Subscribe</button>
+					</span>
+				</div>
+				<div id="mce-responses" class="clear">
+					<div class="response" id="mce-error-response" style="display:none"></div>
+					<div class="response" id="mce-success-response" style="display:none"></div>
+				</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+					<div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_26cea96bbfb24fbc5f58e314f_a92e310c11" tabindex="-1" value=""></div>
+					<div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+					</div>
+			</form>
+
+			
+		</div>
+	</div>
+
+</div>
+
+	</div>
+
+</div>
+</section>
+
+
+	<footer id="footer" class="dark" style="background: url('/styles/site/images/footer-bg.jpg') repeat fixed; background-size: 100% 100%;">
+
+		<div class="container">
+
+			
+			<div class="footer-widgets-wrap clearfix">
+
+				<div class="col_three_fifth">
+
+					<div class="widget clearfix">
+
+						<img src="/images/sealas-logo-yellow-side.png" alt="Encrypted online accounting for freelancers with Sealas" class="alignleft" id="footer-logo">
+
+						<h3>The <strong>S</strong>ecure <strong>E</strong>asy <strong>A</strong>nd <strong>L</strong>ovely <strong>A</strong>ccounting <strong>S</strong>oftware for freelancers and small businesses.</h3>
+
+						<div class="line" style="margin: 30px 0;"></div>
+						<div class="clearfix" style="padding: 10px 0;">
+							<div class="col_half">
+								<address class="nobottommargin">
+									<abbr title="Headquarters" style="display: inline-block;margin-bottom: 7px;"><strong>Imprint:</strong></abbr><br>
+									Sealas is a service by<br>
+									<a href="https://brainsware.at" target="_blank">Brainsware OG</a><br>
+									Liechtensteinstraße 119/21<br>
+									A-1090 Wien
+								</address>
+							</div>
+							<div class="col_half col_last">
+								<br>ATU68014409<br />
+								HG Wien, FN 330963k<br />
+								<abbr title="Email Address"><strong>Email:</strong></abbr> <a href="mailto:contact@sealas.at">contact@sealas.at</a><br>
+								<abbr title="Web"><strong>Web:</strong></abbr> <a href="https://brainsware.at">https://brainsware.at</a><br>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="col_one_fifth">
+					<div class="bottommargin-sm widget_links">
+						<ul>
+							<li><a href="/">Home</a></li>
+							<li><a href="/en/about">About us</a></li>
+							<li><a href="/#features">Features</a></li>
+							
+							<li><a href="/en/pricing">Pricing</a></li>
+							
+							<li><a href="https://github.com/brainsware/sealas-site">Sealas Website on Github</a></li>
+							<li><a href="https://github.com/brainsware/sealas">Sealas App on Github</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col_one_fifth col_last">
+					<div class="bottommargin-sm widget_links">
+						<ul>
+							<li><a href="/en/blog/"><div>Blog</div></a></li>
+							<li><a href="/en/contact">Contact</a></li>
+							<li><a href="/en/agb">TOS</a></li>
+							<li><a href="/en/privacy">Privacy Policy</a></li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+		
+		<div id="copyrights">
+
+			<div class="container clearfix">
+
+				<div class="col_half">
+					&copy; Brainsware OG
+				</div>
+
+				<div class="col_half col_last tright">
+					<div class="fright clearfix">
+						<a href="https://facebook.com/sealasapp" target="_blank" class="social-icon si-small si-borderless nobottommargin si-facebook">
+							<i class="icon-facebook"></i>
+							<i class="icon-facebook"></i>
+						</a>
+
+						<a href="https://twitter.com/sealasapp" target="_blank" class="social-icon si-small si-borderless nobottommargin si-twitter">
+							<i class="icon-twitter"></i>
+							<i class="icon-twitter"></i>
+						</a>
+
+						
+
+						<a href="https://plus.google.com/+SealasAt" target="_blank" class="social-icon si-small si-borderless nobottommargin si-gplus">
+							<i class="icon-gplus"></i>
+							<i class="icon-gplus"></i>
+						</a>
+
+						<a href="https://www.linkedin.com/company/sealas" target="_blank" class="social-icon si-small si-borderless nobottommargin si-linkedin">
+							<i class="icon-linkedin"></i>
+							<i class="icon-linkedin"></i>
+						</a>
+
+						<a href="https://github.com/brainsware" target="_blank" class="social-icon si-small si-borderless nobottommargin si-github">
+							<i class="icon-github"></i>
+							<i class="icon-github"></i>
+						</a>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+	</footer>
+
+	<script type="text/javascript" src="/site.js">
+	</script>
+
+	<noscript><p><img src="//stats.esotericsystems.at/piwik.php?idsite=13" style="border:0;" alt="" /></p></noscript>
+</body>
+</html>
