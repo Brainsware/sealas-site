@@ -1,0 +1,10 @@
+# Default exclude
+.git
+/**/.DS_Store
+/**/*.*~
+/**/*log
+
+# Development exclude
+node_modules
+.sass-cache
+deploy.sh

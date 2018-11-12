@@ -1,0 +1,12 @@
+//
+// Raleway Extra Bold
+// ------------------------------------------------------
+
+@font-face {
+  font-family: 'Raleway';
+  src: local('Raleway Extra Bold'),
+       local('Raleway-ExtraBold'),
+       url('#{$raleway-font-path}/Raleway-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}

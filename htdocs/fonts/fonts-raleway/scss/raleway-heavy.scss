@@ -1,0 +1,12 @@
+//
+// Raleway Heavy / Ultra Bold
+// ------------------------------------------------------
+
+@font-face {
+  font-family: 'Raleway';
+  src: local('Raleway Heavy'),
+       local('Raleway-Heavy'),
+       url('#{$raleway-font-path}/Raleway-Heavy.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}

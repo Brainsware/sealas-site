@@ -1,0 +1,46 @@
+{
+  "name": "fonts-raleway",
+  "version": "0.0.4",
+  "description": "Raleway Web Font Package by Google Fonts",
+  "main": "Gruntfile.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/williamcanin/fonts-raleway"
+  },
+  "keywords": [
+    "raleway",
+    "raleway-bold",
+    "raleway-extrabold",
+    "raleway-heavy",
+    "raleway-light",
+    "raleway-medium",
+    "raleway-regular",
+    "raleway-semibold",
+    "raleway-thin",
+    "webfonts",
+    "web",
+    "fonts"
+  ],
+  "author": "William Canin <william.costa.canin@gmail.com>",
+  "licenses": [
+    {
+      "covers": "software",
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    },
+    {
+      "covers": "fonts",
+      "type": "OFL-1.1",
+      "url": "http://scripts.sil.org/OFL"
+    }
+  ],
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-available-tasks": "^0.6.1",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-cssmin": "^0.6.2",
+    "grunt-contrib-less": "^0.7.0",
+    "grunt-contrib-sass": "^0.8.1",
+    "load-grunt-tasks": "^3.3.0"
+  }
+}
