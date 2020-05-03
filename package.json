@@ -45,7 +45,7 @@
   "repository": "https://github.com/brainsware/sealas-site.git",
   "dependencies": {
     "bootstrap": "^3.3.7",
-    "highlight.js": "^10.0.0",
+    "highlight.js": "^10.0.2",
     "metalsmith-external-links": "^0.1.2",
     "nanoajax": "^0.4.3",
     "node-sass": "^4.7.2"
